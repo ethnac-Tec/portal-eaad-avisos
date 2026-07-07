@@ -1,25 +1,52 @@
-# CODING AGENTS: READ THIS FIRST
+# Portal EAAD · Avisos
 
-This is a **handoff bundle** from Claude Design (claude.ai/design).
+Portal público de avisos para la Escuela de Arquitectura, Arte y Diseño (EAAD) del Tecnológico de Monterrey. Implementado a partir de la variación **"Índice"** diseñada en Claude Design (ver `project/` y `chats/` para el brief y el prototipo original).
 
-A user mocked up designs in HTML/CSS/JS using an AI design tool, then exported this bundle so a coding agent can implement the designs for real.
+## Estructura del repo
 
-## What you should do — IMPORTANT
+- `app/` — aplicación React + Vite (el sitio real)
+- `chats/` — transcripción de la sesión de diseño
+- `project/` — prototipo `.dc.html` original exportado de Claude Design (referencia visual, no se ejecuta en producción)
+- `firebase.json`, `.firebaserc` — configuración de Firebase Hosting
 
-**Read the chat transcripts first.** There are 1 chat transcript(s) in `chats/`. The transcripts show the full back-and-forth between the user and the design assistant — they tell you **what the user actually wants** and **where they landed** after iterating. Don't skip them. The final HTML files are the output, but the chat is where the intent lives.
+## Desarrollo
 
-**Read `project/Portal EAAD - Indice.dc.html` in full.** The user had this file open when they triggered the handoff, so it's almost certainly the primary design they want built. Read it top to bottom — don't skim. Then **follow its imports**: open every file it pulls in (shared components, CSS, scripts) so you understand how the pieces fit together before you start implementing.
+```bash
+cd app
+npm install
+npm run dev
+```
 
-**If anything is ambiguous, ask the user to confirm before you start implementing.** It's much cheaper to clarify scope up front than to build the wrong thing.
+## Build
 
-## About the design files
+```bash
+cd app
+npm run build
+```
 
-The design medium is **HTML/CSS/JS** — these are prototypes, not production code. Your job is to **recreate them pixel-perfectly** in whatever technology makes sense for the target codebase (React, Vue, native, whatever fits). Match the visual output; don't copy the prototype's internal structure unless it happens to fit.
+Genera `app/dist/`.
 
-**Don't render these files in a browser or take screenshots unless the user asks you to.** Everything you need — dimensions, colors, layout rules — is spelled out in the source. Read the HTML and CSS directly; a screenshot won't tell you anything they don't.
+## Contenido desde Notion
 
-## Bundle contents
+Los avisos se traen de Notion **en build time** (no en cada visita): un script consulta la base de datos, filtra solo los avisos con estado "Aprobado" (configurable) y regenera `app/src/data.js` con ese contenido antes de compilar. El token de Notion nunca llega al navegador.
 
-- `README.md` — this file
-- `chats/` — conversation transcripts (read these!)
-- `project/` — the `Portal de noticias EAAD` project files (HTML prototypes, assets, components)
+1. Crea una integración interna en Notion (Settings → Connections → Develop or manage integrations) y comparte tu base de avisos con ella (menú "..." de la base → Connections).
+2. `cd app && cp .env.example .env` y rellena `NOTION_TOKEN` y `NOTION_DATABASE_ID` (el ID está en la URL de la base).
+3. Si tus columnas en Notion tienen nombres distintos a los de `PROPERTY_MAP` en `app/scripts/fetch-notion.mjs`, edítalos ahí para que coincidan.
+4. `npm run fetch:notion` — vuelve a escribir `src/data.js` con los avisos reales.
+
+`.env` está en `.gitignore`; nunca se commitea. Para producción (CI/CD), define `NOTION_TOKEN` y `NOTION_DATABASE_ID` como variables/secretos de tu pipeline en lugar de un archivo `.env`.
+
+## Deploy a Firebase Hosting
+
+1. Reemplaza `REPLACE_WITH_YOUR_FIREBASE_PROJECT_ID` en `.firebaserc` con el ID real de tu proyecto de Firebase.
+2. `cd app && npm run build:notion` (fetch de Notion + build) — o `npm run build` si por ahora quieres quedarte con los datos de muestra.
+3. Desde la raíz del repo: `firebase deploy --only hosting`
+
+Como el contenido se congela en cada build, necesitas rebuildear y redeployar para que un aviso recién aprobado aparezca en el sitio. Si más adelante quieres que esto sea automático (p. ej. cada 15 min, o disparado cuando el administrador aprueba una nota), lo más simple es un GitHub Action con cron que corra los pasos 2–3 — puedo montarlo cuando tengas el repo en GitHub y el proyecto de Firebase listos.
+
+## Estado actual
+
+- Vista pública: feed con destacado, chips de filtro por carrera (Arquitectura, Arte Digital, Diseño, Urbanismo), grid de tarjetas y vista de detalle. URLs con React Router (`/`, `/aviso/:id`) para poder compartir enlaces directos a cada aviso.
+- Integración con Notion vía `app/scripts/fetch-notion.mjs` (build-time, filtrada por estado). Datos de muestra en `app/src/data.js` mientras no se corra el fetch — mismo formato en ambos casos.
+- Fuera de alcance por ahora (no diseñado todavía, ver `chats/chat1.md`): formulario de captura para profesores, cola de aprobación del administrador, lógica de revisión con IA.

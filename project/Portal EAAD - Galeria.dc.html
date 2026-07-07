@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body { background: #f3efe7; }
+  a { color: #16346b; text-decoration: none; }
+  a:hover { color: #0e2450; }
+  ::selection { background: #d9c9a8; }
+  @keyframes eaadFade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+</style>
+</helmet>
+
+<div style="min-height: 100vh; background: #f3efe7; color: #201d18; font-family: 'Public Sans', system-ui, sans-serif; -webkit-font-smoothing: antialiased;">
+
+  <!-- ===== TOP BAR ===== -->
+  <header style="position: sticky; top: 0; z-index: 40; background: rgba(243,239,231,0.88); backdrop-filter: blur(12px); border-bottom: 1px solid #e0d8c8;">
+    <div style="max-width: 1180px; margin: 0 auto; padding: 14px 22px; display: flex; align-items: center; justify-content: space-between; gap: 16px;">
+      <a href="#" onClick="{{ goHome }}" style="display: flex; flex-direction: column; line-height: 1.05; text-decoration: none; color: inherit;">
+        <span style="font-family: 'Newsreader', serif; font-weight: 600; font-size: 22px; letter-spacing: -0.01em; color: #16346b;">EAAD · Avisos</span>
+        <span style="font-size: 10.5px; letter-spacing: 0.13em; text-transform: uppercase; color: #7c7259; margin-top: 2px;">Arquitectura · Arte · Diseño</span>
+      </a>
+      <a href="https://eaad.tec.mx" target="_blank" style="font-size: 13px; font-weight: 600; color: #16346b; border: 1px solid #c9bfa8; padding: 8px 14px; border-radius: 999px; white-space: nowrap;">Portal EAAD ↗</a>
+    </div>
+  </header>
+
+  <!-- ===== FEED VIEW ===== -->
+  <sc-if value="{{ isFeed }}" hint-placeholder-val="{{ true }}">
+  <main style="max-width: 1180px; margin: 0 auto; padding: 0 22px 80px;">
+
+    <!-- Masthead -->
+    <section style="padding: 46px 0 30px; border-bottom: 1px solid #e0d8c8;">
+      <p style="margin: 0 0 14px; font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: #a4643c; font-weight: 600;">Boletín de la comunidad · Centro Occidente</p>
+      <h1 style="margin: 0; font-family: 'Newsreader', serif; font-weight: 500; font-size: clamp(34px, 6vw, 60px); line-height: 1.02; letter-spacing: -0.02em; color: #1a1712; max-width: 15ch;">Lo que sucede en <span style="font-style: italic; color: #16346b;">nuestra</span> escuela</h1>
+      <p style="margin: 18px 0 0; font-size: clamp(15px, 2.2vw, 18px); line-height: 1.6; color: #5b5341; max-width: 56ch;">Talleres, congresos, exposiciones y reconocimientos de Arquitectura, Arte Digital, Diseño y Urbanismo. Curado por y para la comunidad EAAD.</p>
+    </section>
+
+    <!-- Category chips -->
+    <nav style="display: flex; flex-wrap: wrap; gap: 9px; padding: 22px 0 26px; position: sticky; top: 61px; z-index: 30; background: #f3efe7;">
+      <sc-for list="{{ chips }}" as="chip" hint-placeholder-count="5">
+        <button onClick="{{ chip.onClick }}" style="{{ chip.style }}">{{ chip.label }}</button>
+      </sc-for>
+    </nav>
+
+    <!-- Featured story -->
+    <sc-if value="{{ hasFeatured }}" hint-placeholder-val="{{ true }}">
+    <article onClick="{{ featured.open }}" style="cursor: pointer; display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 0; border: 1px solid #e0d8c8; border-radius: 6px; overflow: hidden; background: #fbf8f2; margin-bottom: 40px; animation: eaadFade 0.5s ease both;">
+      <div style="position: relative; min-height: 300px; background: #e6ddcc;">
+        <img src="{{ featured.image }}" alt="" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;">
+        <span style="position: absolute; top: 16px; left: 16px; background: rgba(251,248,242,0.94); color: {{ featured.color }}; font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; padding: 6px 11px; border-radius: 999px;">{{ featured.carrera }}</span>
+      </div>
+      <div style="padding: clamp(24px, 4vw, 42px); display: flex; flex-direction: column; justify-content: center;">
+        <p style="margin: 0 0 12px; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: #a4643c; font-weight: 600;">Destacado · {{ featured.tipo }}</p>
+        <h2 style="margin: 0; font-family: 'Newsreader', serif; font-weight: 500; font-size: clamp(26px, 3.4vw, 38px); line-height: 1.08; letter-spacing: -0.01em; color: #1a1712;">{{ featured.title }}</h2>
+        <p style="margin: 16px 0 0; font-size: 16px; line-height: 1.6; color: #5b5341;">{{ featured.summary }}</p>
+        <div style="display: flex; align-items: center; gap: 14px; margin-top: 26px; font-size: 13px; color: #7c7259;">
+          <span style="font-weight: 600; color: #201d18;">{{ featured.autor }}</span>
+          <span>·</span>
+          <span>{{ featured.campus }}</span>
+          <span>·</span>
+          <span>{{ featured.fecha }}</span>
+        </div>
+      </div>
+    </article>
+    </sc-if>
+
+    <!-- Grid -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr)); gap: 26px;">
+      <sc-for list="{{ cards }}" as="card" hint-placeholder-count="4">
+        <article onClick="{{ card.open }}" style="cursor: pointer; display: flex; flex-direction: column; background: #fbf8f2; border: 1px solid #e6ddcc; border-radius: 6px; overflow: hidden; animation: eaadFade 0.5s ease both;">
+          <div style="position: relative; aspect-ratio: 3 / 2; background: #e6ddcc;">
+            <img src="{{ card.image }}" alt="" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;">
+            <span style="position: absolute; top: 13px; left: 13px; background: rgba(251,248,242,0.94); color: {{ card.color }}; font-size: 10.5px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; padding: 5px 10px; border-radius: 999px;">{{ card.carrera }}</span>
+          </div>
+          <div style="padding: 20px 20px 22px; display: flex; flex-direction: column; flex: 1;">
+            <p style="margin: 0 0 9px; font-size: 11.5px; letter-spacing: 0.09em; text-transform: uppercase; color: #a4643c; font-weight: 600;">{{ card.tipo }}</p>
+            <h3 style="margin: 0; font-family: 'Newsreader', serif; font-weight: 500; font-size: 22px; line-height: 1.14; letter-spacing: -0.01em; color: #1a1712;">{{ card.title }}</h3>
+            <p style="margin: 11px 0 0; font-size: 14.5px; line-height: 1.55; color: #5b5341; flex: 1;">{{ card.summary }}</p>
+            <div style="display: flex; align-items: center; gap: 10px; margin-top: 20px; padding-top: 15px; border-top: 1px solid #ece4d4; font-size: 12.5px; color: #7c7259;">
+              <span style="font-weight: 600; color: #201d18;">{{ card.autor }}</span>
+              <span style="margin-left: auto;">{{ card.fecha }}</span>
+            </div>
+          </div>
+        </article>
+      </sc-for>
+    </div>
+
+    <sc-if value="{{ isEmpty }}" hint-placeholder-val="{{ false }}">
+      <p style="text-align: center; padding: 60px 0; color: #7c7259; font-size: 16px;">No hay avisos en esta categoría por ahora.</p>
+    </sc-if>
+
+  </main>
+  </sc-if>
+
+  <!-- ===== DETAIL VIEW ===== -->
+  <sc-if value="{{ isDetail }}" hint-placeholder-val="{{ false }}">
+  <main style="animation: eaadFade 0.4s ease both;">
+    <div style="max-width: 820px; margin: 0 auto; padding: 22px 22px 0;">
+      <button onClick="{{ goHome }}" style="background: none; border: none; cursor: pointer; font-family: 'Public Sans', sans-serif; font-size: 13.5px; font-weight: 600; color: #16346b; padding: 8px 0; display: inline-flex; align-items: center; gap: 7px;">← Todos los avisos</button>
+    </div>
+
+    <article style="max-width: 820px; margin: 0 auto; padding: 10px 22px 90px;">
+      <p style="margin: 8px 0 14px; font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; font-weight: 700; color: {{ current.color }};">{{ current.carrera }} · {{ current.tipo }}</p>
+      <h1 style="margin: 0; font-family: 'Newsreader', serif; font-weight: 500; font-size: clamp(30px, 5.5vw, 52px); line-height: 1.05; letter-spacing: -0.02em; color: #1a1712;">{{ current.title }}</h1>
+
+      <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin: 22px 0 26px; font-size: 13.5px; color: #7c7259;">
+        <span style="font-weight: 700; color: #201d18;">{{ current.autor }}</span>
+        <span style="color: #b8ac92;">·</span>
+        <span>{{ current.autorRol }}</span>
+        <span style="color: #b8ac92;">·</span>
+        <span>{{ current.campus }}</span>
+        <span style="color: #b8ac92;">·</span>
+        <span>{{ current.fecha }}</span>
+      </div>
+
+      <div style="position: relative; aspect-ratio: 16 / 9; background: #e6ddcc; border-radius: 6px; overflow: hidden; margin-bottom: 34px;">
+        <img src="{{ current.image }}" alt="" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;">
+      </div>
+
+      <div style="font-size: 18px; line-height: 1.7; color: #33301f;">
+        <p style="margin: 0 0 22px; font-size: 20px; line-height: 1.55; color: #1a1712; font-weight: 500;">{{ current.summary }}</p>
+        <sc-for list="{{ current.body }}" as="para" hint-placeholder-count="3">
+          <p style="margin: 0 0 22px;">{{ para }}</p>
+        </sc-for>
+      </div>
+
+      <!-- Meta footer -->
+      <div style="margin-top: 40px; padding: 26px 28px; background: #fbf8f2; border: 1px solid #e6ddcc; border-radius: 6px; display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 22px 30px;">
+        <div>
+          <p style="margin: 0 0 5px; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: #a4643c; font-weight: 700;">Departamento / Iniciativa</p>
+          <p style="margin: 0; font-size: 15px; color: #201d18;">{{ current.depto }}</p>
+        </div>
+        <div>
+          <p style="margin: 0 0 5px; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: #a4643c; font-weight: 700;">Socios</p>
+          <p style="margin: 0; font-size: 15px; color: #201d18;">{{ current.socios }}</p>
+        </div>
+        <div>
+          <p style="margin: 0 0 5px; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: #a4643c; font-weight: 700;">Estudiantes</p>
+          <p style="margin: 0; font-size: 15px; color: #201d18;">{{ current.estudiantes }}</p>
+        </div>
+      </div>
+    </article>
+
+    <!-- More -->
+    <section style="border-top: 1px solid #e0d8c8; background: #efe9dd;">
+      <div style="max-width: 1180px; margin: 0 auto; padding: 40px 22px 70px;">
+        <h3 style="margin: 0 0 22px; font-family: 'Newsreader', serif; font-weight: 500; font-size: 24px; color: #1a1712;">Más avisos</h3>
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr)); gap: 22px;">
+          <sc-for list="{{ related }}" as="card" hint-placeholder-count="3">
+            <article onClick="{{ card.open }}" style="cursor: pointer; display: flex; flex-direction: column; background: #fbf8f2; border: 1px solid #e6ddcc; border-radius: 6px; overflow: hidden;">
+              <div style="position: relative; aspect-ratio: 3 / 2; background: #e6ddcc;">
+                <img src="{{ card.image }}" alt="" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;">
+              </div>
+              <div style="padding: 16px 18px 20px;">
+                <p style="margin: 0 0 7px; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; font-weight: 700; color: {{ card.color }};">{{ card.carrera }}</p>
+                <h4 style="margin: 0; font-family: 'Newsreader', serif; font-weight: 500; font-size: 18px; line-height: 1.15; color: #1a1712;">{{ card.title }}</h4>
+              </div>
+            </article>
+          </sc-for>
+        </div>
+      </div>
+    </section>
+  </main>
+  </sc-if>
+
+  <!-- ===== FOOTER ===== -->
+  <footer style="background: #16346b; color: #cdd6e8;">
+    <div style="max-width: 1180px; margin: 0 auto; padding: 40px 22px; display: flex; flex-wrap: wrap; gap: 20px; justify-content: space-between; align-items: center;">
+      <div>
+        <p style="margin: 0; font-family: 'Newsreader', serif; font-size: 20px; color: #fff;">EAAD · Avisos</p>
+        <p style="margin: 6px 0 0; font-size: 13px; color: #9fb0d0;">Escuela de Arquitectura, Arte y Diseño · Tecnológico de Monterrey</p>
+      </div>
+      <p style="margin: 0; font-size: 12.5px; color: #8296bd;">Los profesores registran sus avisos por formulario. Revisión de redacción y aprobación antes de publicar.</p>
+    </div>
+  </footer>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { view: 'feed', selected: null, carrera: 'Todas' };
+
+  CARRERAS = ['Todas', 'Arquitectura', 'Arte Digital', 'Diseño', 'Urbanismo'];
+
+  COLORS = {
+    'Arquitectura': '#a4643c',
+    'Arte Digital': '#3f6f8a',
+    'Diseño': '#8a6d2f',
+    'Urbanismo': '#4f7050',
+  };
+
+  DATA = [
+    {
+      id: 'arq-sust', carrera: 'Arquitectura', tipo: 'Congreso / Simposio',
+      title: 'Semana de la Arquitectura Sustentable',
+      image: 'https://images.unsplash.com/photo-1487958449943-2429e8be8625?w=1100&q=80&auto=format&fit=crop',
+      summary: 'Jornada de conferencias y talleres enfocados en diseño paramétrico y el uso de biomateriales en la construcción vertical, con participación de despachos internacionales.',
+      autor: 'Dr. Roberto Silva', autorRol: 'Depto. de Arquitectura', campus: 'Monterrey', fecha: '15 ago 2026',
+      depto: 'Arquitectura · Ruta Azul', socios: 'Cemex, Municipio de Monterrey', estudiantes: 'Alumnos de 7.º semestre, Taller de Proyectos',
+      featured: true,
+      body: [
+        'Durante cinco días, el campus se convierte en un laboratorio abierto donde estudiantes y profesionales exploran las nuevas fronteras de la construcción sustentable. El eje de esta edición es el diseño paramétrico aplicado a envolventes de alto desempeño térmico.',
+        'Los talleres prácticos incluyen prototipado con biomateriales de base local y sesiones de modelado con herramientas de simulación ambiental. Cada equipo presentará una propuesta de fachada evaluada por un jurado de despachos invitados.',
+        'La semana cierra con una mesa redonda sobre política pública y vivienda, en colaboración con el Municipio de Monterrey.'
+      ],
+    },
+    {
+      id: 'diseno-ecos', carrera: 'Diseño', tipo: 'Exposición',
+      title: 'Ecos del Diseño: ergonomía inclusiva',
+      image: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=1100&q=80&auto=format&fit=crop',
+      summary: 'Muestra inmersiva de proyectos de diseño industrial centrados en la ergonomía inclusiva y el mobiliario urbano para personas con discapacidad.',
+      autor: 'Mtra. Elena Garza', autorRol: 'Depto. de Diseño', campus: 'Ciudad de México', fecha: '02 sep 2026',
+      depto: 'Diseño · Impacto Social', socios: 'DIF Nacional, Herman Miller', estudiantes: 'Sociedad de Alumnos de Diseño (SALDI)',
+      body: [
+        'La exposición reúne dieciocho proyectos desarrollados a lo largo de dos semestres, todos partiendo de una premisa: el diseño como herramienta de inclusión. Los objetos van desde utensilios adaptados hasta sistemas de mobiliario urbano.',
+        'Cada pieza se acompaña de la investigación de campo que la originó, incluyendo entrevistas con usuarios y prototipos funcionales que los visitantes pueden probar.',
+        'La muestra permanecerá abierta al público durante todo septiembre en la galería del campus.'
+      ],
+    },
+    {
+      id: 'arte-generativo', carrera: 'Arte Digital', tipo: 'Taller',
+      title: 'Residencia de arte generativo y datos',
+      image: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=1100&q=80&auto=format&fit=crop',
+      summary: 'Cuatro semanas de residencia donde estudiantes traducen conjuntos de datos ambientales en instalaciones audiovisuales en tiempo real.',
+      autor: 'Mtro. Diego Fuentes', autorRol: 'Depto. de Arte Digital', campus: 'Guadalajara', fecha: '20 sep 2026',
+      depto: 'Arte Digital · Innovación', socios: 'Estudio Lumen, CONAGUA', estudiantes: 'Colectivo Pixel EAAD',
+      body: [
+        'La residencia invita a repensar la relación entre dato y experiencia sensorial. Los participantes trabajan con sensores de calidad del aire instalados en el campus, transformando lecturas en composiciones visuales y sonoras.',
+        'Además de las herramientas de programación creativa, la residencia incluye mentorías con artistas de medios y una sesión abierta de código en vivo.',
+        'El resultado será una instalación permanente en el vestíbulo del edificio de innovación.'
+      ],
+    },
+    {
+      id: 'urb-foro', carrera: 'Urbanismo', tipo: 'Foro',
+      title: 'Foro Ciudad Futura: movilidad y espacio público',
+      image: 'https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=1100&q=80&auto=format&fit=crop',
+      summary: 'Encuentro entre academia, gobierno y ciudadanía para repensar el espacio público y la movilidad activa en el área metropolitana.',
+      autor: 'Dra. Ana Robles', autorRol: 'Depto. de Urbanismo', campus: 'Monterrey', fecha: '08 oct 2026',
+      depto: 'Urbanismo · Impacto Social', socios: 'IMPLAN, ONU-Hábitat', estudiantes: 'Taller de Análisis Urbano',
+      body: [
+        'El foro reúne a especialistas en movilidad, planeación y participación ciudadana para discutir el rediseño de corredores estratégicos de la ciudad. La jornada combina ponencias con mesas de trabajo por sector.',
+        'Los estudiantes presentan un diagnóstico cartográfico elaborado durante el semestre, con propuestas de intervención de bajo costo y alto impacto.',
+        'Las conclusiones se entregarán como recomendaciones a las autoridades locales de planeación.'
+      ],
+    },
+    {
+      id: 'arq-vivienda', carrera: 'Arquitectura', tipo: 'Concurso',
+      title: 'Concurso de vivienda social progresiva',
+      image: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1100&q=80&auto=format&fit=crop',
+      summary: 'Estudiantes de tercer año presentan prototipos de vivienda adaptable y de bajo costo para contextos de crecimiento informal.',
+      autor: 'Arq. Laura Méndez', autorRol: 'Depto. de Arquitectura', campus: 'Puebla', fecha: '14 oct 2026',
+      depto: 'Arquitectura · Ruta Azul', socios: 'INFONAVIT, Hábitat para la Humanidad', estudiantes: 'Alumnos de 3.º año',
+      body: [
+        'El concurso reta a los equipos a diseñar una vivienda que crezca con la familia que la habita, partiendo de un núcleo mínimo habitable y un sistema constructivo replicable.',
+        'Los proyectos se evalúan por su viabilidad económica, su desempeño ambiental y su sensibilidad al contexto social.',
+        'El proyecto ganador será desarrollado a escala 1:1 como parte de un programa piloto.'
+      ],
+    },
+    {
+      id: 'arte-motion', carrera: 'Arte Digital', tipo: 'Muestra',
+      title: 'Muestra anual de animación y motion',
+      image: 'https://images.unsplash.com/photo-1522542550221-31fd19575a2d?w=1100&q=80&auto=format&fit=crop',
+      summary: 'Proyección de los cortometrajes y piezas de motion graphics realizados por estudiantes durante el ciclo, con votación del público.',
+      autor: 'Mtra. Sofía León', autorRol: 'Depto. de Arte Digital', campus: 'Monterrey', fecha: '28 oct 2026',
+      depto: 'Arte Digital · Innovación', socios: 'Pixelatl, Canal 22', estudiantes: 'Sociedad de Animación EAAD',
+      body: [
+        'La muestra celebra el trabajo del año en animación 2D, 3D y motion graphics. Cada pieza se proyecta en formato de festival, con introducción de sus autores.',
+        'Este año se incorpora una categoría de narrativa interactiva, con obras que el público puede influir en tiempo real.',
+        'El público asistente vota por su pieza favorita, que recibe una mención en el festival Pixelatl.'
+      ],
+    },
+  ];
+
+  fmt(item) {
+    const self = this;
+    return {
+      ...item,
+      color: this.COLORS[item.carrera] || '#a4643c',
+      open: () => self.setState({ view: 'detail', selected: item.id }),
+    };
+  }
+
+  renderVals() {
+    const self = this;
+    const filtered = this.DATA.filter(d => this.state.carrera === 'Todas' || d.carrera === this.state.carrera);
+
+    const chips = this.CARRERAS.map(c => {
+      const active = this.state.carrera === c;
+      return {
+        label: c,
+        onClick: () => self.setState({ carrera: c }),
+        style: [
+          'cursor:pointer',
+          "font-family:'Public Sans',sans-serif",
+          'font-size:13.5px',
+          'font-weight:600',
+          'padding:8px 16px',
+          'border-radius:999px',
+          'transition:all .15s ease',
+          active ? 'background:#16346b' : 'background:#fbf8f2',
+          active ? 'color:#fff' : 'color:#5b5341',
+          active ? 'border:1px solid #16346b' : 'border:1px solid #d9d0bd',
+        ].join(';'),
+      };
+    });
+
+    const featuredRaw = filtered.find(d => d.featured) || filtered[0];
+    const featured = featuredRaw ? this.fmt(featuredRaw) : null;
+    const cards = filtered.filter(d => !featuredRaw || d.id !== featuredRaw.id).map(d => this.fmt(d));
+
+    const current = this.state.selected ? this.fmt(this.DATA.find(d => d.id === this.state.selected)) : null;
+    const related = current ? this.DATA.filter(d => d.id !== current.id).slice(0, 3).map(d => this.fmt(d)) : [];
+
+    return {
+      isFeed: this.state.view === 'feed',
+      isDetail: this.state.view === 'detail' && !!current,
+      goHome: () => self.setState({ view: 'feed', selected: null }),
+      chips,
+      featured,
+      hasFeatured: !!featured,
+      cards,
+      isEmpty: filtered.length === 0,
+      current,
+      related,
+    };
+  }
+}
+</script>
+</body>
+</html>

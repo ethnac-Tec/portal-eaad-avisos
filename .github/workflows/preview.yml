@@ -1,0 +1,45 @@
+name: Vista previa (fetch Notion + build)
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: {}
+
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: app
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+
+      - run: npm ci
+
+      - name: Traer avisos de Notion
+        run: npm run fetch:notion
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
+
+      - name: Generar vista previa (un solo archivo HTML)
+        run: npm run build:preview
+
+      - name: Generar build de producción
+        run: npm run build
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: vista-previa
+          path: app/dist-preview/index.html
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sitio-produccion
+          path: app/dist

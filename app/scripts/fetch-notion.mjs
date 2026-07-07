@@ -30,23 +30,29 @@ if (!NOTION_TOKEN || !NOTION_DATABASE_ID) {
 
 // Field name used by the app -> real Notion column name.
 // Edit the right-hand side if a column gets renamed in Notion.
+// (Confirmed against the actual database on 2026-07 — see the
+// "Columnas reales detectadas" log line if this ever drifts again.)
 const COLUMNS = {
-  title: 'Nombre del evento',
-  autor: 'nombre',
+  title: 'Nombre del Evento',
+  autor: 'Nombre',
   campus: 'Campus',
-  depto: 'Departamento o iniciativa',
+  depto: 'Departamento o Iniciativa (selecciona todas las que apliquen)',
   fecha: 'Fecha del evento',
-  descripcion: 'Descripción del evento',
-  estudiantes: 'Equipo involucrado',
-  socios: 'Socios formadores',
+  descripcion: 'Descripción',
+  // Assumption: "Estudiantes Involucrados" is the one meant for public
+  // display (vs. "Equipo involucrado", which reads more like internal
+  // staff/faculty). Flag if this should be the other one instead.
+  estudiantes: 'Estudiantes Involucrados',
+  socios: 'Socios Formadores',
   image: 'Imágenes',
   tipo: 'Tipo de evento',
   estado: 'Estado',
 };
 
-// Carrera isn't its own Notion column yet — we infer it from the
-// "Departamento o iniciativa" text by matching one of these keywords.
-// Falls back to null (no carrera badge/color) if nothing matches.
+// Carrera isn't its own Notion column — we infer it from the
+// "Departamento o Iniciativa" multi-select by matching one of these
+// keywords against the selected tags. Falls back to null (no carrera
+// badge/color) if nothing matches.
 const CARRERAS = ['Arquitectura', 'Arte Digital', 'Diseño', 'Urbanismo'];
 
 export const COLORS = {

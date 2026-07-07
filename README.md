@@ -37,26 +37,21 @@ Los avisos se traen de Notion **en build time** (no en cada visita): un script c
 
 `.env` está en `.gitignore`; nunca se commitea. En CI (ver abajo) los mismos dos valores se guardan como *secrets* de GitHub Actions, no como archivo.
 
-## GitHub Actions (`.github/workflows/preview.yml`)
+## GitHub Actions (`.github/workflows/deploy.yml`) — deploy automático
 
-Como este entorno de desarrollo no tiene salida a internet hacia Notion, el fetch real se prueba en GitHub Actions, que sí tiene acceso normal. El workflow corre en cada push a `main` (o manualmente) y hace: fetch de Notion → build de vista previa (un solo HTML) → build de producción → sube ambos como *artifacts* descargables desde la pestaña **Actions** del repo.
+Como este entorno de desarrollo no tiene salida a internet hacia Notion ni Firebase, todo el fetch + build + deploy real corre en GitHub Actions. El workflow se dispara en cada push a `main`, manualmente, **y cada 20 minutos por cron** — así que un aviso marcado "Publicado" en Notion queda visible en el sitio en vivo en un máximo de ~20 minutos, sin que nadie tenga que tocar nada.
 
-**Configurar los secrets (una sola vez):**
-1. En el repo de GitHub → **Settings** → **Secrets and variables** → **Actions** → **New repository secret**.
-2. Crea `NOTION_TOKEN` con el token de la integración.
-3. Crea `NOTION_DATABASE_ID` con el ID de la base.
+Cada corrida hace: fetch de Notion → build de vista previa (un solo HTML, como artifact descargable) → build de producción → **deploy a Firebase Hosting** (canal `live`, o sea la URL pública real).
 
-**Correr el workflow y descargar la vista previa:**
-1. Pestaña **Actions** del repo → workflow "Vista previa (fetch Notion + build)" → **Run workflow** (o simplemente espera a que corra solo después de un push).
-2. Cuando termine (ícono verde ✓), entra a esa ejecución → hasta abajo, sección **Artifacts** → descarga `vista-previa` → descomprime → abre el `index.html` con doble clic, igual que antes pero con tus datos reales.
+**Configurar los secrets (una sola vez), en el repo de GitHub → Settings → Secrets and variables → Actions → New repository secret:**
+1. `NOTION_TOKEN` — el token de la integración de Notion.
+2. `NOTION_DATABASE_ID` — el ID de la base.
+3. `FIREBASE_SERVICE_ACCOUNT` — el contenido completo del JSON de la cuenta de servicio (Firebase Console → Configuración del proyecto → Cuentas de servicio → Generar nueva clave privada).
 
-## Deploy a Firebase Hosting
-
-1. Reemplaza `REPLACE_WITH_YOUR_FIREBASE_PROJECT_ID` en `.firebaserc` con el ID real de tu proyecto de Firebase.
-2. `cd app && npm run build:notion` (fetch de Notion + build) — o `npm run build` si por ahora quieres quedarte con los datos de muestra.
-3. Desde la raíz del repo: `firebase deploy --only hosting`
-
-Como el contenido se congela en cada build, necesitas rebuildear y redeployar para que un aviso recién aprobado aparezca en el sitio. Si más adelante quieres que esto sea automático (p. ej. cada 15 min, o disparado cuando el administrador aprueba una nota), lo más simple es un GitHub Action con cron que corra los pasos 2–3 — puedo montarlo cuando tengas el repo en GitHub y el proyecto de Firebase listos.
+**Correr el workflow manualmente / descargar la vista previa:**
+1. Pestaña **Actions** del repo → workflow "Fetch Notion, build y deploy a Firebase Hosting" → **Run workflow** (o espera a que corra solo).
+2. Para ver el sitio en vivo: `https://portal-eaad-noticias.web.app` (o `.firebaseapp.com`) una vez que una corrida termine en verde.
+3. Para la vista previa de un solo archivo (además del sitio en vivo): entra a esa ejecución → sección **Artifacts** → descarga `vista-previa`.
 
 ## Estado actual
 

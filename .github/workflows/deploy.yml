@@ -1,16 +1,16 @@
-name: Vista previa (fetch Notion + build)
+name: Fetch Notion, build y deploy a Firebase Hosting
 
 on:
   push:
     branches: [main]
   workflow_dispatch: {}
+  schedule:
+    # Cada 20 minutos: trae avisos nuevos/aprobados de Notion y republica solo.
+    - cron: '*/20 * * * *'
 
 jobs:
-  preview:
+  deploy:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: app
     steps:
       - uses: actions/checkout@v4
 
@@ -20,18 +20,23 @@ jobs:
           cache: npm
           cache-dependency-path: app/package-lock.json
 
-      - run: npm ci
+      - name: Instalar dependencias
+        working-directory: app
+        run: npm ci
 
       - name: Traer avisos de Notion
+        working-directory: app
         run: npm run fetch:notion
         env:
           NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
           NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
 
       - name: Generar vista previa (un solo archivo HTML)
+        working-directory: app
         run: npm run build:preview
 
       - name: Generar build de producción
+        working-directory: app
         run: npm run build
 
       - uses: actions/upload-artifact@v4
@@ -39,7 +44,10 @@ jobs:
           name: vista-previa
           path: app/dist-preview/index.html
 
-      - uses: actions/upload-artifact@v4
+      - name: Deploy a Firebase Hosting
+        uses: FirebaseExtended/action-hosting-deploy@v0
         with:
-          name: sitio-produccion
-          path: app/dist
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          projectId: portal-eaad-noticias
+          channelId: live

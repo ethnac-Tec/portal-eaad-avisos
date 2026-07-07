@@ -204,6 +204,14 @@ async function main() {
   const pages = await queryDatabase();
   console.log(`${pages.length} aviso(s) publicado(s) encontrados.`);
 
+  if (pages.length) {
+    console.log('Columnas reales detectadas en Notion (nombre exacto → tipo):');
+    for (const [name, prop] of Object.entries(pages[0].properties)) {
+      console.log(`  - "${name}" -> ${prop.type}`);
+    }
+    console.log('Si algún campo salió vacío/"Sin título" abajo, compara contra COLUMNS en este script.');
+  }
+
   const avisos = pages.map(mapPage);
 
   const sinCarrera = avisos.filter((a) => !a.carrera);

@@ -11,8 +11,8 @@ export default function CategoryChips({ active, onChange }) {
             onClick={() => onChange(carrera)}
             style={{
               ...styles.chip,
-              color: isActive ? '#0b2f6b' : '#6b7484',
-              boxShadow: isActive ? 'inset 0 -2px 0 #d4472f' : 'none',
+              color: isActive ? '#000000' : '#6b7484',
+              boxShadow: isActive ? 'inset 0 -2px 0 #000000' : 'none',
             }}
           >
             {carrera}
@@ -33,11 +33,11 @@ const styles = {
     position: 'sticky',
     top: 55,
     zIndex: 30,
-    background: '#eef0f3',
+    background: '#ffffff',
   },
   chip: {
     cursor: 'pointer',
-    fontFamily: "'Public Sans', sans-serif",
+    fontFamily: 'Arial, Helvetica, sans-serif',
     fontSize: '13.5px',
     fontWeight: 600,
     padding: '12px 18px',

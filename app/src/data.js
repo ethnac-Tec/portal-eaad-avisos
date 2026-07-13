@@ -7,10 +7,10 @@
 export const CARRERAS = ['Todas', 'Arquitectura', 'Arte Digital', 'Diseño', 'Urbanismo'];
 
 export const COLORS = {
-  Arquitectura: '#c0562b',
-  'Arte Digital': '#2f6f8f',
-  Diseño: '#9a7a1f',
-  Urbanismo: '#3f7a4f',
+  Arquitectura: '#00A3AD',
+  'Arte Digital': '#B23A82',
+  Diseño: '#B8860B',
+  Urbanismo: '#6B8E23',
 };
 
 export const AVISOS = [
@@ -27,6 +27,7 @@ export const AVISOS = [
     autorRol: 'Depto. de Arquitectura',
     campus: 'Monterrey',
     fecha: '15 ago 2026',
+    fechaISO: '2026-08-15',
     depto: 'Arquitectura · Ruta Azul',
     socios: 'Cemex, Municipio de Monterrey',
     estudiantes: 'Alumnos de 7.º semestre, Taller de Proyectos',
@@ -50,6 +51,7 @@ export const AVISOS = [
     autorRol: 'Depto. de Diseño',
     campus: 'Ciudad de México',
     fecha: '02 sep 2026',
+    fechaISO: '2026-09-02',
     depto: 'Diseño · Impacto Social',
     socios: 'DIF Nacional, Herman Miller',
     estudiantes: 'Sociedad de Alumnos de Diseño (SALDI)',
@@ -72,6 +74,7 @@ export const AVISOS = [
     autorRol: 'Depto. de Arte Digital',
     campus: 'Guadalajara',
     fecha: '20 sep 2026',
+    fechaISO: '2026-09-20',
     depto: 'Arte Digital · Innovación',
     socios: 'Estudio Lumen, CONAGUA',
     estudiantes: 'Colectivo Pixel EAAD',
@@ -94,6 +97,7 @@ export const AVISOS = [
     autorRol: 'Depto. de Urbanismo',
     campus: 'Monterrey',
     fecha: '08 oct 2026',
+    fechaISO: '2026-10-08',
     depto: 'Urbanismo · Impacto Social',
     socios: 'IMPLAN, ONU-Hábitat',
     estudiantes: 'Taller de Análisis Urbano',
@@ -116,6 +120,7 @@ export const AVISOS = [
     autorRol: 'Depto. de Arquitectura',
     campus: 'Puebla',
     fecha: '14 oct 2026',
+    fechaISO: '2026-10-14',
     depto: 'Arquitectura · Ruta Azul',
     socios: 'INFONAVIT, Hábitat para la Humanidad',
     estudiantes: 'Alumnos de 3.º año',
@@ -138,6 +143,7 @@ export const AVISOS = [
     autorRol: 'Depto. de Arte Digital',
     campus: 'Monterrey',
     fecha: '28 oct 2026',
+    fechaISO: '2026-10-28',
     depto: 'Arte Digital · Innovación',
     socios: 'Pixelatl, Canal 22',
     estudiantes: 'Sociedad de Animación EAAD',

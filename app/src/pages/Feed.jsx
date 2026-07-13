@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { AVISOS } from '../data';
+import { matchesCampus } from '../campus';
 import CategoryChips from '../components/CategoryChips';
 import FeaturedStory from '../components/FeaturedStory';
 import NewsCard from '../components/NewsCard';
@@ -8,10 +9,14 @@ import NewsCard from '../components/NewsCard';
 export default function Feed() {
   const [searchParams, setSearchParams] = useSearchParams();
   const carrera = searchParams.get('carrera') || 'Todas';
+  const campus = searchParams.get('campus') || null;
 
   const filtered = useMemo(
-    () => AVISOS.filter((d) => carrera === 'Todas' || d.carrera === carrera),
-    [carrera]
+    () =>
+      AVISOS.filter(
+        (d) => (carrera === 'Todas' || d.carrera === carrera) && matchesCampus(d, campus)
+      ),
+    [carrera, campus]
   );
 
   const featured = useMemo(() => filtered.find((d) => d.featured) || filtered[0] || null, [filtered]);
@@ -21,11 +26,10 @@ export default function Feed() {
   );
 
   function handleCarreraChange(next) {
-    if (next === 'Todas') {
-      setSearchParams({});
-    } else {
-      setSearchParams({ carrera: next });
-    }
+    const params = new URLSearchParams(searchParams);
+    if (next === 'Todas') params.delete('carrera');
+    else params.set('carrera', next);
+    setSearchParams(params);
   }
 
   return (
@@ -35,10 +39,14 @@ export default function Feed() {
           <span style={styles.kickerBar} />
           <p style={styles.kicker}>Boletín · Centro Occidente</p>
         </div>
-        <h1 style={styles.title}>Avisos de la comunidad EAAD</h1>
+        <h1 style={styles.title}>Boletín de Noticias EAAD</h1>
         <p style={styles.lede}>
-          Un índice curado de talleres, congresos, exposiciones y reconocimientos de Arquitectura, Arte
-          Digital, Diseño y Urbanismo.
+          Este boletín es el punto de encuentro de nuestra comunidad, un espacio diseñado para
+          celebrar el talento, la innovación y los logros que emergen de nuestros cuatro campus.
+          Aquí encontrarás una curaduría de los proyectos más destacados, reconocimientos
+          académicos, talleres y eventos que definen el futuro de nuestras disciplinas. Te
+          invitamos a explorar el impacto de nuestros estudiantes y profesores, y a ser parte de
+          la narrativa creativa que nos une y nos proyecta hacia el exterior.
         </p>
       </section>
 
@@ -75,24 +83,24 @@ const styles = {
   kickerBar: {
     width: 26,
     height: 3,
-    background: '#d4472f',
+    background: '#210702',
   },
   kicker: {
     margin: 0,
     fontSize: 12,
     letterSpacing: '0.16em',
     textTransform: 'uppercase',
-    color: '#55627a',
+    color: '#003AA1',
     fontWeight: 700,
   },
   title: {
     margin: 0,
-    fontFamily: "'Space Grotesk', sans-serif",
-    fontWeight: 600,
+    fontFamily: 'Arial, Helvetica, sans-serif',
+    fontWeight: 700,
     fontSize: 'clamp(32px, 5.5vw, 58px)',
     lineHeight: 1.0,
     letterSpacing: '-0.03em',
-    color: '#0b2f6b',
+    color: '#000000',
     maxWidth: '16ch',
   },
   lede: {

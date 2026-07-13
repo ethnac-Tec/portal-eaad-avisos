@@ -16,8 +16,8 @@ export default function Footer() {
 
 const styles = {
   footer: {
-    background: '#0b2f6b',
-    color: '#cdd8ef',
+    background: '#000000',
+    color: '#dddddd',
   },
   inner: {
     maxWidth: 1200,
@@ -31,7 +31,7 @@ const styles = {
   },
   title: {
     margin: 0,
-    fontFamily: "'Space Grotesk', sans-serif",
+    fontFamily: 'Arial, Helvetica, sans-serif',
     fontWeight: 700,
     fontSize: 20,
     color: '#fff',
@@ -39,12 +39,12 @@ const styles = {
   subtitle: {
     margin: '6px 0 0',
     fontSize: 13,
-    color: '#9fb6e0',
+    color: '#b3b3b3',
   },
   note: {
     margin: 0,
     fontSize: '12.5px',
-    color: '#7f96c4',
+    color: '#999999',
     maxWidth: '40ch',
   },
 };

@@ -70,7 +70,7 @@ const styles = {
     marginBottom: 11,
   },
   carrera: {
-    fontFamily: "'Space Grotesk', sans-serif",
+    fontFamily: 'Arial, Helvetica, sans-serif',
     fontWeight: 700,
     fontSize: 11,
     letterSpacing: '0.04em',
@@ -91,8 +91,8 @@ const styles = {
   },
   title: {
     margin: 0,
-    fontFamily: "'Space Grotesk', sans-serif",
-    fontWeight: 600,
+    fontFamily: 'Arial, Helvetica, sans-serif',
+    fontWeight: 700,
     fontSize: 20,
     lineHeight: 1.14,
     letterSpacing: '-0.01em',

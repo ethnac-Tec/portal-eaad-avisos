@@ -1,6 +1,6 @@
 # Portal EAAD · Avisos
 
-Portal público de avisos para la Escuela de Arquitectura, Arte y Diseño (EAAD) del Tecnológico de Monterrey. Implementado a partir de la variación **"Índice"** diseñada en Claude Design (ver `project/` y `chats/` para el brief y el prototipo original).
+Portal público de avisos para la Escuela de Arquitectura, Arte y Diseño (EAAD) del Tecnológico de Monterrey. Implementado a partir de la variación **"Índice"** diseñada en Claude Design (ver `project/` y `chats/` para el brief y el prototipo original), con una segunda iteración de diseño (rebrand a blanco y negro, filtro por campus, vista de calendario) traída de vuelta desde Claude Design y adaptada al código real.
 
 ## Estructura del repo
 
@@ -55,6 +55,9 @@ Cada corrida hace: fetch de Notion → build de vista previa (un solo HTML, como
 
 ## Estado actual
 
-- Vista pública: feed con destacado, chips de filtro por carrera (Arquitectura, Arte Digital, Diseño, Urbanismo), grid de tarjetas y vista de detalle. URLs con React Router (`/`, `/aviso/:id`) para poder compartir enlaces directos a cada aviso.
+- Vista pública: feed con destacado, chips de filtro por carrera (Arquitectura, Arte Digital, Diseño, Urbanismo), grid de tarjetas y vista de detalle. URLs con React Router (`/`, `/aviso/:id`, `/calendario`) para poder compartir enlaces directos a cada aviso.
+- Panel "Navegar" (filtro por Campus + acceso a Calendario + link a Carreras): columna fija en escritorio, menú colapsable en móvil. La lista de campus se arma sola a partir de los valores reales en los datos, no está hardcodeada.
+- Vista de Calendario mensual con los avisos ubicados por fecha; clic en un evento abre un modal con resumen y link a la nota completa.
+- Paleta monocromática (negro/blanco) y tipografía Arial/Helvetica, actualizada desde una segunda iteración en Claude Design.
 - Integración con Notion vía `app/scripts/fetch-notion.mjs` (build-time, filtrada por estado). Datos de muestra en `app/src/data.js` mientras no se corra el fetch — mismo formato en ambos casos.
-- Fuera de alcance por ahora (no diseñado todavía, ver `chats/chat1.md`): formulario de captura para profesores, cola de aprobación del administrador, lógica de revisión con IA.
+- Fuera de alcance por ahora (no diseñado todavía, ver `chats/chat1.md`): formulario de captura para profesores, cola de aprobación del administrador, lógica de revisión con IA, y "convocatorias" con horario/registro en el calendario (el diseño las incluía, pero no hay campo de Notion para eso todavía).

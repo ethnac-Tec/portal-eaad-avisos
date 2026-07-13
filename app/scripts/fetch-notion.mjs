@@ -56,10 +56,10 @@ const COLUMNS = {
 const CARRERAS = ['Arquitectura', 'Arte Digital', 'Diseño', 'Urbanismo'];
 
 export const COLORS = {
-  Arquitectura: '#c0562b',
-  'Arte Digital': '#2f6f8f',
-  Diseño: '#9a7a1f',
-  Urbanismo: '#3f7a4f',
+  Arquitectura: '#00A3AD',
+  'Arte Digital': '#B23A82',
+  Diseño: '#B8860B',
+  Urbanismo: '#6B8E23',
 };
 
 function normalize(str) {
@@ -111,6 +111,15 @@ function readProperty(page, field) {
     default:
       return null;
   }
+}
+
+// Raw ISO date (YYYY-MM-DD), separate from the human-formatted `fecha`
+// string, so the calendar view can match avisos to specific days.
+function readDateISO(page, field) {
+  const columnName = COLUMNS[field];
+  const prop = page.properties[columnName];
+  const start = prop?.date?.start;
+  return start ? start.slice(0, 10) : null;
 }
 
 function slugify(title, fallbackId) {
@@ -180,6 +189,7 @@ function mapPage(page) {
     autorRol: '',
     campus: readProperty(page, 'campus') || '',
     fecha: readProperty(page, 'fecha') || '',
+    fechaISO: readDateISO(page, 'fecha'),
     depto,
     socios: readProperty(page, 'socios') || '',
     estudiantes: readProperty(page, 'estudiantes') || '',
@@ -195,10 +205,10 @@ function toModuleSource(avisos) {
 export const CARRERAS = ['Todas', 'Arquitectura', 'Arte Digital', 'Diseño', 'Urbanismo'];
 
 export const COLORS = {
-  Arquitectura: '#c0562b',
-  'Arte Digital': '#2f6f8f',
-  Diseño: '#9a7a1f',
-  Urbanismo: '#3f7a4f',
+  Arquitectura: '#00A3AD',
+  'Arte Digital': '#B23A82',
+  Diseño: '#B8860B',
+  Urbanismo: '#6B8E23',
 };
 
 export const AVISOS = ${JSON.stringify(avisos, null, 2)};

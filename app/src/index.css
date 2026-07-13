@@ -9,9 +9,9 @@ body {
 }
 
 body {
-  background: #eef0f3;
+  background: #ffffff;
   color: #14171c;
-  font-family: 'Public Sans', system-ui, sans-serif;
+  font-family: Arial, Helvetica, sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -20,12 +20,12 @@ body {
 }
 
 a {
-  color: #0b2f6b;
+  color: #000000;
   text-decoration: none;
 }
 
 a:hover {
-  color: #072047;
+  color: #333333;
 }
 
 button {
@@ -38,7 +38,7 @@ img {
 }
 
 ::selection {
-  background: #cdd8ef;
+  background: #d9d9d9;
 }
 
 @keyframes eaadFade {
@@ -49,5 +49,44 @@ img {
   to {
     opacity: 1;
     transform: none;
+  }
+}
+
+/* Persistent "Navegar" nav: a real sticky column on desktop (reserves its
+   own space so it never overlaps page content), collapses to a menu
+   trigger + dropdown panel on narrow/mobile viewports. */
+.app-shell {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+.app-shell > .content-col {
+  flex: 1;
+  min-width: 0;
+}
+
+.nav-sidebar-desktop {
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  width: 170px;
+  position: sticky;
+  top: 76px;
+}
+
+.nav-sidebar-mobile-trigger {
+  display: none;
+}
+
+@media (max-width: 899px) {
+  .app-shell {
+    display: block;
+  }
+  .nav-sidebar-desktop {
+    display: none;
+  }
+  .nav-sidebar-mobile-trigger {
+    display: block;
   }
 }

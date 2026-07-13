@@ -1,18 +1,26 @@
 import { HashRouter, Routes, Route } from 'react-router-dom';
 import TopBar from './components/TopBar';
 import Footer from './components/Footer';
+import NavSidebar from './components/NavSidebar';
 import Feed from './pages/Feed';
 import Detail from './pages/Detail';
+import Calendar from './pages/Calendar';
 
 function App() {
   return (
     <HashRouter>
       <div style={styles.page}>
         <TopBar />
-        <Routes>
-          <Route path="/" element={<Feed />} />
-          <Route path="/aviso/:id" element={<Detail />} />
-        </Routes>
+        <div className="app-shell">
+          <NavSidebar />
+          <div className="content-col">
+            <Routes>
+              <Route path="/" element={<Feed />} />
+              <Route path="/aviso/:id" element={<Detail />} />
+              <Route path="/calendario" element={<Calendar />} />
+            </Routes>
+          </div>
+        </div>
         <Footer />
       </div>
     </HashRouter>
@@ -22,9 +30,9 @@ function App() {
 const styles = {
   page: {
     minHeight: '100vh',
-    background: '#eef0f3',
+    background: '#ffffff',
     color: '#14171c',
-    fontFamily: "'Public Sans', system-ui, sans-serif",
+    fontFamily: 'Arial, Helvetica, sans-serif',
     WebkitFontSmoothing: 'antialiased',
   },
 };

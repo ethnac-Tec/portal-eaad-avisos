@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom';
+
 export default function Footer() {
   return (
     <footer style={styles.footer}>
@@ -7,7 +9,11 @@ export default function Footer() {
           <p style={styles.subtitle}>Escuela de Arquitectura, Arte y Diseño · Tecnológico de Monterrey</p>
         </div>
         <p style={styles.note}>
-          Los profesores registran sus avisos por formulario. Revisión de redacción y aprobación antes de publicar.
+          Los profesores registran sus avisos por{' '}
+          <Link to="/enviar" style={styles.link}>
+            formulario
+          </Link>
+          . Revisión de redacción y aprobación antes de publicar.
         </p>
       </div>
     </footer>
@@ -46,5 +52,9 @@ const styles = {
     fontSize: '12.5px',
     color: '#999999',
     maxWidth: '40ch',
+  },
+  link: {
+    color: '#dddddd',
+    textDecoration: 'underline',
   },
 };

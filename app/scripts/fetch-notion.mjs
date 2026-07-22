@@ -36,21 +36,21 @@ const COLUMNS = {
   title: 'Nombre del Evento',
   autor: 'Nombre',
   campus: 'Campus',
-  depto: 'Departamento o Iniciativa (selecciona todas las que apliquen)',
+  depto: 'Departamento, Carrera o Iniciativa (selecciona todas las que apliquen)',
+  insignias: 'Insignias de la escuela',
   fecha: 'Fecha del evento',
   descripcion: 'Descripción',
-  // Assumption: "Estudiantes Involucrados" is the one meant for public
-  // display (vs. "Equipo involucrado", which reads more like internal
-  // staff/faculty). Flag if this should be the other one instead.
-  estudiantes: 'Estudiantes Involucrados',
+  // "Estudiantes Involucrados" was merged into "Equipo involucrado" in a
+  // form update — this is now the single field for both.
+  estudiantes: 'Equipo involucrado',
   socios: 'Socios Formadores',
   image: 'Imágenes',
   tipo: 'Tipo de evento',
   estado: 'Estado',
 };
 
-// Carrera isn't its own Notion column — we infer it from the
-// "Departamento o Iniciativa" multi-select by matching one of these
+// Carrera isn't its own dedicated Notion column — we infer it from the
+// "Insignias de la escuela" multi-select by matching one of these
 // keywords against the selected tags. Falls back to null (no carrera
 // badge/color) if nothing matches.
 const CARRERAS = ['Arquitectura', 'Arte Digital', 'Diseño', 'Urbanismo'];
@@ -176,11 +176,12 @@ function splitDescripcion(descripcion) {
 function mapPage(page) {
   const title = readProperty(page, 'title') || 'Sin título';
   const depto = readProperty(page, 'depto') || '';
+  const insignias = readProperty(page, 'insignias') || '';
   const { summary, body } = splitDescripcion(readProperty(page, 'descripcion'));
 
   return {
     id: slugify(title, page.id),
-    carrera: inferCarrera(depto),
+    carrera: inferCarrera(insignias),
     tipo: readProperty(page, 'tipo') || '',
     title,
     image: readProperty(page, 'image') || '',
@@ -233,7 +234,7 @@ async function main() {
   const sinCarrera = avisos.filter((a) => !a.carrera);
   if (sinCarrera.length) {
     console.warn(
-      `Aviso: ${sinCarrera.length} aviso(s) sin carrera detectable en "Departamento o iniciativa": ` +
+      `Aviso: ${sinCarrera.length} aviso(s) sin carrera detectable en "Insignias de la escuela": ` +
         sinCarrera.map((a) => `"${a.title}"`).join(', ')
     );
   }

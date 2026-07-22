@@ -38,13 +38,6 @@ jobs:
       - name: Generar build de producción
         working-directory: app
         run: npm run build
-        env:
-          VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
-          VITE_FIREBASE_AUTH_DOMAIN: ${{ secrets.VITE_FIREBASE_AUTH_DOMAIN }}
-          VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
-          VITE_FIREBASE_STORAGE_BUCKET: ${{ secrets.VITE_FIREBASE_STORAGE_BUCKET }}
-          VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}
-          VITE_FIREBASE_APP_ID: ${{ secrets.VITE_FIREBASE_APP_ID }}
 
       - uses: actions/upload-artifact@v4
         with:
@@ -58,27 +51,3 @@ jobs:
           firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
           projectId: portal-eaad-noticias
           channelId: live
-
-      - name: Instalar dependencias de functions
-        working-directory: functions
-        run: npm ci
-
-      - name: Guardar credenciales de servicio
-        run: echo "$FIREBASE_SERVICE_ACCOUNT_JSON" > /tmp/firebase-sa.json
-        env:
-          FIREBASE_SERVICE_ACCOUNT_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-
-      - name: Sincronizar token de Notion (escritura) en Firebase Secret Manager
-        working-directory: functions
-        run: |
-          echo -n "$NOTION_WRITE_TOKEN" | npx firebase-tools functions:secrets:set NOTION_WRITE_TOKEN \
-            --project portal-eaad-noticias --data-file=- --force
-        env:
-          GOOGLE_APPLICATION_CREDENTIALS: /tmp/firebase-sa.json
-          NOTION_WRITE_TOKEN: ${{ secrets.NOTION_WRITE_TOKEN }}
-
-      - name: Deploy Cloud Functions
-        working-directory: functions
-        run: npx firebase-tools deploy --only functions --project portal-eaad-noticias --non-interactive
-        env:
-          GOOGLE_APPLICATION_CREDENTIALS: /tmp/firebase-sa.json

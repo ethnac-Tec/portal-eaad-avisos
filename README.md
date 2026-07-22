@@ -5,10 +5,9 @@ Portal público de avisos para la Escuela de Arquitectura, Arte y Diseño (EAAD)
 ## Estructura del repo
 
 - `app/` — aplicación React + Vite (el sitio real)
-- `functions/` — Cloud Function que recibe el formulario de profesores y escribe a Notion
 - `chats/` — transcripción de la sesión de diseño
 - `project/` — prototipo `.dc.html` original exportado de Claude Design (referencia visual, no se ejecuta en producción)
-- `firebase.json`, `.firebaserc` — configuración de Firebase Hosting + Functions
+- `firebase.json`, `.firebaserc` — configuración de Firebase Hosting
 
 ## Desarrollo
 
@@ -56,20 +55,9 @@ Cada corrida hace: fetch de Notion → build de vista previa (un solo HTML, como
 2. Para ver el sitio en vivo: `https://portal-eaad-noticias.web.app` (o `.firebaseapp.com`) una vez que una corrida termine en verde.
 3. Para la vista previa de un solo archivo (además del sitio en vivo): entra a esa ejecución → sección **Artifacts** → descarga `vista-previa`.
 
-## Formulario de profesores (`/enviar`)
+## Formulario de profesores
 
-Los profesores capturan avisos directo en el sitio, sin cuenta ni contraseña: escriben su correo institucional, reciben un enlace de un solo uso ("magic link"), y al abrirlo quedan verificados. El envío llega a la misma base de Notion con Estado = "No publicado" — tu flujo de aprobación en Notion sigue exactamente igual.
-
-**Configuración única en Firebase (por consola, no requiere terminal):**
-1. **Plan Blaze** — Firebase Console → engrane → Uso y facturación → cambia del plan Spark (gratis) a Blaze (pago por uso; Cloud Functions no corre en el plan gratuito, pero el uso de un formulario de este tamaño se queda dentro del nivel gratuito de Blaze).
-2. **Authentication → Sign-in method** → habilita **"Email link (passwordless sign-in)"**.
-3. **Notion**: en la integración que ya conectaste, confirma que **"Insert content"** esté habilitado en Capabilities (además de "Read content", que ya tenías).
-
-Después de eso, todo se despliega solo vía GitHub Actions (ver secrets arriba) — no hay que correr nada manualmente.
-
-El dominio permitido para el formulario es `tec.mx` (configurable con `VITE_ALLOWED_EMAIL_DOMAIN` en el build del sitio y `ALLOWED_DOMAIN` en `functions/index.js` — deben coincidir). La verificación real ocurre en la Cloud Function, usando el correo confirmado por Firebase, no lo que el navegador mande — así que aunque alguien manipule el formulario, no puede hacerse pasar por otro dominio.
-
-**Nota de alcance:** por ahora la imagen del aviso se captura como un link a una imagen ya subida a otro lado (no hay subida de archivos todavía). Si esto es fricción para los profesores, es fácil sumar carga de archivos con Firebase Storage — dime cuando lo necesites.
+Se mantiene en **Tally** (no en el sitio): [tally.so/r/gDQDjP](https://tally.so/r/gDQDjP), linkeado desde el footer del sitio. Se evaluó construir un formulario nativo con verificación por correo institucional (Firebase Auth + Cloud Function escribiendo directo a Notion), pero requería el plan de pago Blaze de Firebase, que no está autorizado — se descartó por ahora. Si más adelante se autoriza ese gasto, o aparece otra forma de restringir el acceso sin necesitar Blaze, se puede retomar.
 
 ## Estado actual
 
@@ -78,6 +66,6 @@ El dominio permitido para el formulario es `tec.mx` (configurable con `VITE_ALLO
 - Vista de Calendario mensual con los avisos ubicados por fecha; clic en un evento abre un modal con resumen y link a la nota completa.
 - Paleta monocromática (negro/blanco) y tipografía Arial/Helvetica, actualizada desde una segunda iteración en Claude Design.
 - Integración con Notion vía `app/scripts/fetch-notion.mjs` (build-time, filtrada por estado). Datos de muestra en `app/src/data.js` mientras no se corra el fetch — mismo formato en ambos casos.
-- Formulario de profesores en `/enviar`: login por magic-link restringido a `@tec.mx`, Cloud Function (`functions/`) que escribe a Notion con Estado = "No publicado".
+- Formulario de profesores: se queda en Tally (ver arriba), linkeado desde el footer.
 - Cola de aprobación del administrador: resuelta directamente en Notion (columna Estado, "No publicado" → "Publicado"), sin vista propia en el sitio.
-- Fuera de alcance por ahora: lógica de revisión con IA, subida de archivos de imagen (por ahora es un link), y "convocatorias" con horario/registro en el calendario (el diseño las incluía, pero no hay campo de Notion para eso todavía).
+- Fuera de alcance por ahora: lógica de revisión con IA, y "convocatorias" con horario/registro en el calendario (el diseño las incluía, pero no hay campo de Notion para eso todavía).

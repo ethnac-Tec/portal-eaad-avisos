@@ -1,5 +1,3 @@
-import { Link } from 'react-router-dom';
-
 export default function Footer() {
   return (
     <footer style={styles.footer}>
@@ -10,9 +8,9 @@ export default function Footer() {
         </div>
         <p style={styles.note}>
           Los profesores registran sus avisos por{' '}
-          <Link to="/enviar" style={styles.link}>
+          <a href="https://tally.so/r/gDQDjP" target="_blank" rel="noreferrer" style={styles.link}>
             formulario
-          </Link>
+          </a>
           . Revisión de redacción y aprobación antes de publicar.
         </p>
       </div>

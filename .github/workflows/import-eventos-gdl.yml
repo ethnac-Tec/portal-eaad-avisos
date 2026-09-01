@@ -1,0 +1,21 @@
+name: Importar Eventos GDL a Notion (una sola vez)
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Crear avisos en Notion
+        working-directory: app
+        run: node scripts/import-eventos-gdl.mjs
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}

@@ -32,7 +32,7 @@ const styles = {
     minHeight: '100vh',
     background: '#ffffff',
     color: '#14171c',
-    fontFamily: 'Arial, Helvetica, sans-serif',
+    fontFamily: 'Inter, Arial, Helvetica, sans-serif',
     WebkitFontSmoothing: 'antialiased',
   },
 };

@@ -280,8 +280,19 @@ const styles = {
     color: '#14171c',
     zIndex: 2,
   },
-  modalImageWrap: { position: 'relative', aspectRatio: '16 / 9', background: '#dce1e8' },
-  modalImage: { position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' },
+  // `contain` (not `cover`) on purpose: posters for "Programado" items can
+  // come in any aspect ratio (portrait flyers included), and we'd rather
+  // show the whole design with neutral letterbox bars than crop it.
+  modalImageWrap: {
+    position: 'relative',
+    minHeight: 220,
+    maxHeight: '50vh',
+    background: '#dce1e8',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  modalImage: { display: 'block', width: '100%', maxHeight: '50vh', objectFit: 'contain' },
   modalColorBar: { position: 'absolute', top: 0, left: 0, height: 6, width: '100%' },
   modalBody: { padding: '26px 28px 28px' },
   modalBadge: {

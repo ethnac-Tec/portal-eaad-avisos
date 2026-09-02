@@ -8,8 +8,12 @@
 //   NOTION_DATABASE_ID      — the database ID (from its URL)
 //
 // Optional env vars:
-//   NOTION_STATUS_VALUE     — status value that means "ready to publish"
-//                              (default: Publicado)
+//   NOTION_STATUS_VALUES    — comma-separated status values to pull in
+//                              (default: Publicado,Programado). "Publicado"
+//                              is a full note; "Programado" is a save-the-
+//                              date placeholder (title + date, maybe a
+//                              poster image, no article yet) that shows on
+//                              the calendar but never in the main feed.
 
 import { writeFile } from 'node:fs/promises';
 import path from 'node:path';
@@ -19,7 +23,10 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const NOTION_TOKEN = process.env.NOTION_TOKEN;
 const NOTION_DATABASE_ID = process.env.NOTION_DATABASE_ID;
-const STATUS_VALUE = process.env.NOTION_STATUS_VALUE || 'Publicado';
+const STATUS_VALUES = (process.env.NOTION_STATUS_VALUES || 'Publicado,Programado')
+  .split(',')
+  .map((s) => s.trim())
+  .filter(Boolean);
 
 if (!NOTION_TOKEN || !NOTION_DATABASE_ID) {
   console.error(
@@ -144,8 +151,10 @@ async function queryDatabase() {
       body: JSON.stringify({
         start_cursor: cursor,
         filter: {
-          property: COLUMNS.estado,
-          status: { equals: STATUS_VALUE },
+          or: STATUS_VALUES.map((value) => ({
+            property: COLUMNS.estado,
+            status: { equals: value },
+          })),
         },
       }),
     });
@@ -181,6 +190,7 @@ function mapPage(page) {
 
   return {
     id: slugify(title, page.id),
+    estado: readProperty(page, 'estado') || '',
     carrera: inferCarrera(insignias),
     tipo: readProperty(page, 'tipo') || '',
     title,
@@ -212,14 +222,20 @@ export const COLORS = {
   Urbanismo: '#6B8E23',
 };
 
+// Todo lo que trajo Notion (Publicado + Programado) — usar solo donde
+// realmente se necesitan los "save the date" (por ahora, el calendario).
 export const AVISOS = ${JSON.stringify(avisos, null, 2)};
+
+// Solo notas completas y aprobadas — lo que debe usarse en el feed, el
+// detalle, "más avisos" y la lista de campus.
+export const PUBLICADOS = AVISOS.filter((a) => a.estado === 'Publicado');
 `;
 }
 
 async function main() {
-  console.log(`Consultando Notion (Estado = "${STATUS_VALUE}")...`);
+  console.log(`Consultando Notion (Estado en: ${STATUS_VALUES.join(', ')})...`);
   const pages = await queryDatabase();
-  console.log(`${pages.length} aviso(s) publicado(s) encontrados.`);
+  console.log(`${pages.length} página(s) encontrada(s).`);
 
   if (pages.length) {
     console.log('Columnas reales detectadas en Notion (nombre exacto → tipo):');
@@ -230,6 +246,11 @@ async function main() {
   }
 
   const avisos = pages.map(mapPage);
+  const porEstado = avisos.reduce((acc, a) => {
+    acc[a.estado] = (acc[a.estado] || 0) + 1;
+    return acc;
+  }, {});
+  console.log('Por estado:', porEstado);
 
   const sinCarrera = avisos.filter((a) => !a.carrera);
   if (sinCarrera.length) {

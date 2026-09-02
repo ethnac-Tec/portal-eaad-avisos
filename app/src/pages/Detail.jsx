@@ -1,11 +1,14 @@
 import { useEffect } from 'react';
 import { Link, Navigate, useParams } from 'react-router-dom';
-import { AVISOS, COLORS } from '../data';
+import { PUBLICADOS, COLORS } from '../data';
 import RelatedCard from '../components/RelatedCard';
 
 export default function Detail() {
   const { id } = useParams();
-  const current = AVISOS.find((d) => d.id === id);
+  // Only Publicado avisos have a real detail page — a Programado
+  // (save-the-date) item has no article yet, so it 404s here like any
+  // other unknown id.
+  const current = PUBLICADOS.find((d) => d.id === id);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -16,7 +19,7 @@ export default function Detail() {
   }
 
   const color = COLORS[current.carrera] || '#c0562b';
-  const related = AVISOS.filter((d) => d.id !== current.id).slice(0, 3);
+  const related = PUBLICADOS.filter((d) => d.id !== current.id).slice(0, 3);
   const subMetaParts = [current.autor, current.autorRol, current.campus, current.fecha].filter(Boolean);
 
   return (

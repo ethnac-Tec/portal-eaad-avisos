@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { AVISOS } from '../data';
+import { PUBLICADOS } from '../data';
 import { matchesCampus } from '../campus';
 import CategoryChips from '../components/CategoryChips';
 import FeaturedStory from '../components/FeaturedStory';
@@ -13,7 +13,7 @@ export default function Feed() {
 
   const filtered = useMemo(
     () =>
-      AVISOS.filter(
+      PUBLICADOS.filter(
         (d) => (carrera === 'Todas' || d.carrera === carrera) && matchesCampus(d, campus)
       ),
     [carrera, campus]

@@ -22,7 +22,11 @@ function buildCalDays(year, month, today) {
     const iso = `${year}-${String(month + 1).padStart(2, '0')}-${String(num).padStart(2, '0')}`;
     const isToday =
       year === today.getFullYear() && month === today.getMonth() && num === today.getDate();
-    const events = AVISOS.filter((d) => d.fechaISO === iso);
+    const dayItems = AVISOS.filter((d) => d.fechaISO === iso);
+    // Once the real note for a date exists, hide the "save the date"
+    // placeholder(s) for that same day — the note takes its slot.
+    const hasPublicado = dayItems.some((d) => d.estado === 'Publicado');
+    const events = hasPublicado ? dayItems.filter((d) => d.estado === 'Publicado') : dayItems;
     return { num, iso, isToday, events };
   });
 }
@@ -36,6 +40,7 @@ export default function Calendar() {
   const calDays = useMemo(() => buildCalDays(cursor.year, cursor.month, today), [cursor, today]);
   const selected = selectedId ? AVISOS.find((d) => d.id === selectedId) : null;
   const selectedColor = selected ? COLORS[selected.carrera] || '#c0562b' : null;
+  const isProgramado = selected?.estado === 'Programado';
 
   function prevMonth() {
     setCursor((c) => (c.month === 0 ? { year: c.year - 1, month: 11 } : { year: c.year, month: c.month - 1 }));
@@ -71,15 +76,23 @@ export default function Calendar() {
             day.num ? (
               <div key={i} style={styles.dayCell}>
                 <span style={day.isToday ? styles.dayNumToday : styles.dayNum}>{day.num}</span>
-                {day.events.map((ev) => (
-                  <div
-                    key={ev.id}
-                    onClick={() => setSelectedId(ev.id)}
-                    style={{ ...styles.eventPill, background: COLORS[ev.carrera] || '#000' }}
-                  >
-                    {ev.title.length > 18 ? ev.title.slice(0, 17) + '…' : ev.title}
-                  </div>
-                ))}
+                {day.events.map((ev) => {
+                  const color = COLORS[ev.carrera] || '#000';
+                  const isProgramado = ev.estado === 'Programado';
+                  return (
+                    <div
+                      key={ev.id}
+                      onClick={() => setSelectedId(ev.id)}
+                      style={
+                        isProgramado
+                          ? { ...styles.eventPill, ...styles.eventPillOutline, borderColor: color, color }
+                          : { ...styles.eventPill, background: color }
+                      }
+                    >
+                      {ev.title.length > 18 ? ev.title.slice(0, 17) + '…' : ev.title}
+                    </div>
+                  );
+                })}
               </div>
             ) : (
               <div key={i} style={styles.emptyCell} />
@@ -97,11 +110,12 @@ export default function Calendar() {
               <div style={{ ...styles.modalColorBar, background: selectedColor }} />
             </div>
             <div style={styles.modalBody}>
+              {isProgramado && <p style={styles.modalBadge}>Próximamente · sin nota publicada todavía</p>}
               <p style={{ ...styles.modalKicker, color: selectedColor }}>
                 {[selected.carrera, selected.tipo].filter(Boolean).join(' · ')}
               </p>
               <h2 style={styles.modalTitle}>{selected.title}</h2>
-              <p style={styles.modalSummary}>{selected.summary}</p>
+              {selected.summary && <p style={styles.modalSummary}>{selected.summary}</p>}
               <div style={styles.modalMeta}>
                 {[selected.fecha, selected.campus, selected.autor].filter(Boolean).map((part, i) => (
                   <span key={i}>
@@ -110,9 +124,11 @@ export default function Calendar() {
                   </span>
                 ))}
               </div>
-              <button onClick={() => navigate(`/aviso/${selected.id}`)} style={styles.modalCta}>
-                Ver nota completa →
-              </button>
+              {!isProgramado && (
+                <button onClick={() => navigate(`/aviso/${selected.id}`)} style={styles.modalCta}>
+                  Ver nota completa →
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -222,6 +238,13 @@ const styles = {
     fontFamily: 'Arial, Helvetica, sans-serif',
     fontWeight: 700,
   },
+  // "Programado" — save-the-date, no article yet: outlined instead of a
+  // solid fill, so it visually reads as lighter/tentative next to real
+  // (solid) published avisos.
+  eventPillOutline: {
+    background: '#fff',
+    border: '1px solid currentColor',
+  },
   overlay: {
     position: 'fixed',
     inset: 0,
@@ -261,6 +284,19 @@ const styles = {
   modalImage: { position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' },
   modalColorBar: { position: 'absolute', top: 0, left: 0, height: 6, width: '100%' },
   modalBody: { padding: '26px 28px 28px' },
+  modalBadge: {
+    display: 'inline-block',
+    margin: '0 0 14px',
+    padding: '4px 10px',
+    borderRadius: 3,
+    background: '#f5f5f5',
+    color: '#55627a',
+    fontFamily: 'Arial, Helvetica, sans-serif',
+    fontSize: 11,
+    fontWeight: 700,
+    letterSpacing: '0.04em',
+    textTransform: 'uppercase',
+  },
   modalKicker: {
     margin: '0 0 10px',
     fontFamily: 'Arial, Helvetica, sans-serif',

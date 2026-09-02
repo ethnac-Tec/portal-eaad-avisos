@@ -28,7 +28,9 @@ Genera `app/dist/`.
 
 ## Contenido desde Notion
 
-Los avisos se traen de Notion **en build time** (no en cada visita): un script consulta la base de datos, filtra solo los avisos con Estado = "Publicado" (configurable) y regenera `app/src/data.js` con ese contenido antes de compilar. El token de Notion nunca llega al navegador. La carrera (Arquitectura/Arte Digital/Diseño/Urbanismo) se detecta automáticamente del texto de "Departamento o iniciativa" — no es una columna propia todavía.
+Los avisos se traen de Notion **en build time** (no en cada visita): un script consulta la base de datos, filtra los avisos con Estado = "Publicado" o "Programado" (configurable vía `NOTION_STATUS_VALUES`, separados por coma) y regenera `app/src/data.js` con ese contenido antes de compilar. El token de Notion nunca llega al navegador. La carrera (Arquitectura/Arte Digital/Diseño/Urbanismo) se detecta automáticamente de la columna "Insignias de la escuela".
+
+`app/src/data.js` exporta dos listas: `AVISOS` (todo lo que trajo Notion, Publicado + Programado — la usa el Calendario) y `PUBLICADOS` (solo notas completas — la usan el feed, el detalle, "más avisos" y la lista de campus). Un aviso "Programado" nunca aparece fuera del calendario.
 
 1. Crea una integración interna en Notion (Settings → Connections → Develop or manage integrations) y comparte tu base de avisos con ella (menú "..." de la base → Connections).
 2. `cd app && cp .env.example .env` y rellena `NOTION_TOKEN` y `NOTION_DATABASE_ID` (el ID está en la URL de la base).
@@ -47,8 +49,6 @@ Cada corrida hace: fetch de Notion → build de vista previa (un solo HTML, como
 1. `NOTION_TOKEN` — el token de la integración de Notion (lectura).
 2. `NOTION_DATABASE_ID` — el ID de la base.
 3. `FIREBASE_SERVICE_ACCOUNT` — el contenido completo del JSON de la cuenta de servicio (Firebase Console → Configuración del proyecto → Cuentas de servicio → Generar nueva clave privada).
-4. `NOTION_WRITE_TOKEN` — token de Notion con permiso de **Insert content** habilitado (puede ser el mismo valor que `NOTION_TOKEN` si esa integración ya tiene esa capacidad activada). Lo usa el formulario de profesores para crear avisos nuevos.
-5. `VITE_FIREBASE_API_KEY`, `VITE_FIREBASE_AUTH_DOMAIN`, `VITE_FIREBASE_PROJECT_ID`, `VITE_FIREBASE_STORAGE_BUCKET`, `VITE_FIREBASE_MESSAGING_SENDER_ID`, `VITE_FIREBASE_APP_ID` — la configuración de tu app web de Firebase (Console → Configuración del proyecto → General → "Tus apps"; si no tienes una app web todavía, créala ahí). No son secretos (van al navegador de cualquier visitante), pero igual se guardan como secret de GitHub por simplicidad.
 
 **Correr el workflow manualmente / descargar la vista previa:**
 1. Pestaña **Actions** del repo → workflow "Fetch Notion, build y deploy a Firebase Hosting" → **Run workflow** (o espera a que corra solo).
@@ -59,11 +59,20 @@ Cada corrida hace: fetch de Notion → build de vista previa (un solo HTML, como
 
 Se mantiene en **Tally** (no en el sitio): [tally.so/r/gDQDjP](https://tally.so/r/gDQDjP), linkeado desde el footer del sitio. Se evaluó construir un formulario nativo con verificación por correo institucional (Firebase Auth + Cloud Function escribiendo directo a Notion), pero requería el plan de pago Blaze de Firebase, que no está autorizado — se descartó por ahora. Si más adelante se autoriza ese gasto, o aparece otra forma de restringir el acceso sin necesitar Blaze, se puede retomar.
 
+## Calendario y avisos "Programado"
+
+Autoservicio para que un profesor agende un evento futuro sin pasar por gestión central: un segundo Tally, más corto (nombre del evento, fecha, carrera, campus, póster), conectado a la **misma base de Notion** vía la integración nativa Tally↔Notion — sin backend nuevo. Cada envío crea una fila con Estado = **"Programado"** (hay que agregar esa opción a la columna Estado en Notion si no existe).
+
+- El fetch trae tanto "Publicado" como "Programado" (ver arriba).
+- El feed, detalle y "más avisos" **nunca** muestran un "Programado" — solo el Calendario (`/calendario`).
+- En el Calendario, un "Programado" se ve como una etiqueta con borde (no rellena) y su modal no tiene botón "Ver nota completa" — solo título, fecha, carrera, campus y el póster si ya lo subieron.
+- Cuando la nota real de ese mismo día se publica (Estado = "Publicado"), el Calendario dejar de mostrar el "Programado" de ese día automáticamente y solo enseña la nota — es una regla de visualización (por fecha), no una fusión de datos: ambas filas siguen existiendo por separado en Notion. Si quieres limpieza real de datos (borrar el placeholder cuando ya existe la nota), es un paso manual en Notion por ahora.
+
 ## Estado actual
 
 - Vista pública: feed con destacado, chips de filtro por carrera (Arquitectura, Arte Digital, Diseño, Urbanismo), grid de tarjetas y vista de detalle. URLs con React Router (`/`, `/aviso/:id`, `/calendario`) para poder compartir enlaces directos a cada aviso.
 - Panel "Navegar" (filtro por Campus + acceso a Calendario + link a Carreras): columna fija en escritorio, menú colapsable en móvil. La lista de campus se arma sola a partir de los valores reales en los datos, no está hardcodeada.
-- Vista de Calendario mensual con los avisos ubicados por fecha; clic en un evento abre un modal con resumen y link a la nota completa.
+- Vista de Calendario mensual con los avisos ubicados por fecha; clic en un evento abre un modal con resumen y link a la nota completa. También muestra avisos "Programado" (save-the-date sin nota todavía, vía un segundo Tally corto — ver sección de arriba).
 - Paleta monocromática (negro/blanco) y tipografía Arial/Helvetica, actualizada desde una segunda iteración en Claude Design.
 - Integración con Notion vía `app/scripts/fetch-notion.mjs` (build-time, filtrada por estado). Datos de muestra en `app/src/data.js` mientras no se corra el fetch — mismo formato en ambos casos.
 - Formulario de profesores: se queda en Tally (ver arriba), linkeado desde el footer.

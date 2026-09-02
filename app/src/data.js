@@ -1,8 +1,9 @@
 // Sample data shaped to mirror the fields captured in the professor
-// submission form and, eventually, the Notion database:
-// titulo, cuerpo, categoria/carrera, tipo, campus, fecha, autor,
-// depto/iniciativa, socios, estudiantes, imagen.
-// Swap this module for a real Notion API fetch when credentials are ready.
+// submission form and the Notion database: titulo, cuerpo,
+// categoria/carrera, tipo, campus, fecha, autor, depto/iniciativa, socios,
+// estudiantes, imagen, and estado ("Publicado" = full note, "Programado" =
+// save-the-date placeholder from the short scheduling form, calendar-only).
+// This module is overwritten by `npm run fetch:notion` with real data.
 
 export const CARRERAS = ['Todas', 'Arquitectura', 'Arte Digital', 'Diseño', 'Urbanismo'];
 
@@ -16,6 +17,7 @@ export const COLORS = {
 export const AVISOS = [
   {
     id: 'arq-sust',
+    estado: 'Publicado',
     carrera: 'Arquitectura',
     tipo: 'Congreso / Simposio',
     title: 'Semana de la Arquitectura Sustentable',
@@ -40,6 +42,7 @@ export const AVISOS = [
   },
   {
     id: 'diseno-ecos',
+    estado: 'Publicado',
     carrera: 'Diseño',
     tipo: 'Exposición',
     title: 'Ecos del Diseño: ergonomía inclusiva',
@@ -63,6 +66,7 @@ export const AVISOS = [
   },
   {
     id: 'arte-generativo',
+    estado: 'Publicado',
     carrera: 'Arte Digital',
     tipo: 'Taller',
     title: 'Residencia de arte generativo y datos',
@@ -86,6 +90,7 @@ export const AVISOS = [
   },
   {
     id: 'urb-foro',
+    estado: 'Publicado',
     carrera: 'Urbanismo',
     tipo: 'Foro',
     title: 'Foro Ciudad Futura: movilidad y espacio público',
@@ -109,6 +114,7 @@ export const AVISOS = [
   },
   {
     id: 'arq-vivienda',
+    estado: 'Publicado',
     carrera: 'Arquitectura',
     tipo: 'Concurso',
     title: 'Concurso de vivienda social progresiva',
@@ -132,6 +138,7 @@ export const AVISOS = [
   },
   {
     id: 'arte-motion',
+    estado: 'Publicado',
     carrera: 'Arte Digital',
     tipo: 'Muestra',
     title: 'Muestra anual de animación y motion',
@@ -153,4 +160,30 @@ export const AVISOS = [
       'El público asistente vota por su pieza favorita, que recibe una mención en el festival Pixelatl.',
     ],
   },
+  {
+    // "Programado" — a save-the-date placeholder a professor submitted
+    // through the short Tally form, before the full note exists. Shows on
+    // the calendar as upcoming, never in the feed/detail/related lists.
+    id: 'urb-proximo-simposio',
+    estado: 'Programado',
+    carrera: 'Urbanismo',
+    tipo: 'Simposio',
+    title: 'Simposio de Movilidad Activa (próximamente)',
+    image:
+      'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=1100&q=80&auto=format&fit=crop',
+    summary: '',
+    autor: '',
+    autorRol: '',
+    campus: 'Monterrey',
+    fecha: '20 nov 2026',
+    fechaISO: '2026-11-20',
+    depto: '',
+    socios: '',
+    estudiantes: '',
+    body: [],
+  },
 ];
+
+// Solo notas completas y aprobadas — lo que debe usarse en el feed, el
+// detalle, "más avisos" y la lista de campus.
+export const PUBLICADOS = AVISOS.filter((a) => a.estado === 'Publicado');

@@ -37,7 +37,7 @@ const styles = {
   },
   chip: {
     cursor: 'pointer',
-    fontFamily: 'Arial, Helvetica, sans-serif',
+    fontFamily: 'Inter, Arial, Helvetica, sans-serif',
     fontSize: '13.5px',
     fontWeight: 600,
     padding: '12px 18px',

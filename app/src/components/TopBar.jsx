@@ -41,7 +41,7 @@ const styles = {
     color: '#fff',
   },
   logoMark: {
-    fontFamily: 'Arial, Helvetica, sans-serif',
+    fontFamily: 'Inter, Arial, Helvetica, sans-serif',
     fontWeight: 700,
     fontSize: 21,
     letterSpacing: '-0.02em',

@@ -35,7 +35,7 @@ const styles = {
   },
   title: {
     margin: 0,
-    fontFamily: 'Arial, Helvetica, sans-serif',
+    fontFamily: 'Inter, Arial, Helvetica, sans-serif',
     fontWeight: 700,
     fontSize: 20,
     color: '#fff',

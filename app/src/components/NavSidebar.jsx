@@ -26,9 +26,18 @@ export default function NavSidebar() {
     navigate('/calendario');
   }
 
+  function goHome() {
+    setMobileOpen(false);
+    navigate('/');
+  }
+
   const content = (
     <>
       <p style={styles.heading}>Navegar</p>
+
+      <button onClick={goHome} style={styles.navBtn}>
+        Página Principal
+      </button>
 
       <button
         onClick={() => setCampusOpen((v) => !v)}
@@ -62,7 +71,7 @@ export default function NavSidebar() {
         rel="noreferrer"
         style={styles.navLink}
       >
-        Conoce nuestras Carreras
+        Conoce Nuestras Carreras
       </a>
 
       <button onClick={goCalendar} style={styles.navBtn}>

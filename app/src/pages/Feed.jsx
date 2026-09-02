@@ -95,7 +95,7 @@ const styles = {
   },
   title: {
     margin: 0,
-    fontFamily: 'Arial, Helvetica, sans-serif',
+    fontFamily: 'Inter, Arial, Helvetica, sans-serif',
     fontWeight: 700,
     fontSize: 'clamp(32px, 5.5vw, 58px)',
     lineHeight: 1.0,

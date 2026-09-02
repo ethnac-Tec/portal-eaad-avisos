@@ -103,7 +103,7 @@ const styles = {
     background: 'none',
     border: 'none',
     cursor: 'pointer',
-    fontFamily: 'Arial, Helvetica, sans-serif',
+    fontFamily: 'Inter, Arial, Helvetica, sans-serif',
     fontSize: '13.5px',
     fontWeight: 700,
     color: '#000000',
@@ -128,7 +128,7 @@ const styles = {
     height: 3,
   },
   carrera: {
-    fontFamily: 'Arial, Helvetica, sans-serif',
+    fontFamily: 'Inter, Arial, Helvetica, sans-serif',
     fontWeight: 700,
     fontSize: 12,
     letterSpacing: '0.05em',
@@ -143,7 +143,7 @@ const styles = {
   },
   title: {
     margin: 0,
-    fontFamily: 'Arial, Helvetica, sans-serif',
+    fontFamily: 'Inter, Arial, Helvetica, sans-serif',
     fontWeight: 700,
     fontSize: 'clamp(29px, 5.2vw, 50px)',
     lineHeight: 1.04,
@@ -229,7 +229,7 @@ const styles = {
   },
   moreTitle: {
     margin: '0 0 22px',
-    fontFamily: 'Arial, Helvetica, sans-serif',
+    fontFamily: 'Inter, Arial, Helvetica, sans-serif',
     fontWeight: 700,
     fontSize: 24,
     color: '#000000',

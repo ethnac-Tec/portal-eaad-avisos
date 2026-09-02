@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { AVISOS } from '../data';
+import { PUBLICADOS } from '../data';
 import { getAllCampuses } from '../campus';
 
-const CAMPUSES = getAllCampuses(AVISOS);
+const CAMPUSES = getAllCampuses(PUBLICADOS);
 
 export default function NavSidebar() {
   const [campusOpen, setCampusOpen] = useState(false);

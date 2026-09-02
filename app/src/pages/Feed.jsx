@@ -5,6 +5,7 @@ import { matchesCampus } from '../campus';
 import CategoryChips from '../components/CategoryChips';
 import FeaturedStory from '../components/FeaturedStory';
 import NewsCard from '../components/NewsCard';
+import SpotlightBanner from '../components/SpotlightBanner';
 
 export default function Feed() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -49,6 +50,8 @@ export default function Feed() {
           la narrativa creativa que nos une y nos proyecta hacia el exterior.
         </p>
       </section>
+
+      <SpotlightBanner />
 
       <CategoryChips active={carrera} onChange={handleCarreraChange} />
 

@@ -64,9 +64,13 @@ Se mantiene en **Tally** (no en el sitio): [tally.so/r/gDQDjP](https://tally.so/
 Autoservicio para que un profesor agende un evento futuro sin pasar por gestión central: un segundo Tally, más corto (nombre del evento, fecha, carrera, campus, póster), conectado a la **misma base de Notion** vía la integración nativa Tally↔Notion — sin backend nuevo. Cada envío crea una fila con Estado = **"Programado"** (hay que agregar esa opción a la columna Estado en Notion si no existe).
 
 - El fetch trae tanto "Publicado" como "Programado" (ver arriba).
-- El feed, detalle y "más avisos" **nunca** muestran un "Programado" — solo el Calendario (`/calendario`).
+- El detalle y "más avisos" **nunca** muestran un "Programado" — solo el Calendario (`/calendario`) y el banner de spotlight del feed (ver abajo).
 - En el Calendario, un "Programado" se ve como una etiqueta con borde (no rellena) y su modal no tiene botón "Ver nota completa" — solo título, fecha, carrera, campus y el póster si ya lo subieron.
 - Cuando la nota real de ese mismo día se publica (Estado = "Publicado"), el Calendario dejar de mostrar el "Programado" de ese día automáticamente y solo enseña la nota — es una regla de visualización (por fecha), no una fusión de datos: ambas filas siguen existiendo por separado en Notion. Si quieres limpieza real de datos (borrar el placeholder cuando ya existe la nota), es un paso manual en Notion por ahora.
+
+### Banner de spotlight
+
+Arriba de los chips de categoría en el feed (`app/src/components/SpotlightBanner.jsx`), se muestra automáticamente el "Programado" más próximo en fecha — sin selección manual. Si no hay ningún "Programado" futuro, el banner simplemente no aparece. Enlaza al Calendario (no tiene nota propia todavía). Usa la descripción del Tally corto si la capturaste; si no hay póster todavía, muestra un recuadro gris en su lugar.
 
 ## Estado actual
 

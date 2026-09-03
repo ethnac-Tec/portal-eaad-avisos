@@ -116,6 +116,11 @@ export default function Calendar() {
               </p>
               <h2 style={styles.modalTitle}>{selected.title}</h2>
               {selected.summary && <p style={styles.modalSummary}>{selected.summary}</p>}
+              {selected.body?.map((para, i) => (
+                <p key={i} style={styles.modalSummary}>
+                  {para}
+                </p>
+              ))}
               <div style={styles.modalMeta}>
                 {[selected.fecha, selected.campus, selected.autor].filter(Boolean).map((part, i) => (
                   <span key={i}>

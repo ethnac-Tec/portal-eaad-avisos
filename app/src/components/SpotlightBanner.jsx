@@ -35,6 +35,11 @@ export default function SpotlightBanner() {
         </div>
         <h2 style={styles.title}>{next.title}</h2>
         {next.summary && <p style={styles.summary}>{next.summary}</p>}
+        {next.body?.map((para, i) => (
+          <p key={i} style={styles.summary}>
+            {para}
+          </p>
+        ))}
         <div style={styles.footer}>
           {footerParts.map((part, i) => (
             <span key={i} style={i === 0 ? styles.autor : undefined}>

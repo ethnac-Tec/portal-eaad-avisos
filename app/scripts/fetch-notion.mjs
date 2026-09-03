@@ -202,11 +202,15 @@ function mapPage(page) {
   const depto = readProperty(page, 'depto') || '';
   const insignias = readProperty(page, 'insignias') || '';
   const { summary, body } = splitDescripcion(readProperty(page, 'descripcion'));
+  const carrera = inferCarrera(insignias);
+  if (!carrera) {
+    console.log(`  ⚠ Sin carrera reconocida — "${title}" | Insignias leídas: "${insignias}"`);
+  }
 
   return {
     id: slugify(title, page.id),
     estado: readProperty(page, 'estado') || '',
-    carrera: inferCarrera(insignias),
+    carrera,
     tipo: readProperty(page, 'tipo') || '',
     title,
     image: readProperty(page, 'image') || '',

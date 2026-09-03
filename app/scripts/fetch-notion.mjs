@@ -202,9 +202,15 @@ function mapPage(page) {
   const depto = readProperty(page, 'depto') || '';
   const insignias = readProperty(page, 'insignias') || '';
   const { summary, body } = splitDescripcion(readProperty(page, 'descripcion'));
-  const carrera = inferCarrera(insignias);
+  // "Insignias de la escuela" is the primary source; the short Tally
+  // ("Programado" / save-the-date) form instead saves carrera into
+  // "Departamento, Carrera o Iniciativa..." (the `depto` column), so fall
+  // back to that when the first one is empty.
+  const carrera = inferCarrera(insignias) || inferCarrera(depto);
   if (!carrera) {
-    console.log(`  ⚠ Sin carrera reconocida — "${title}" | Insignias leídas: "${insignias}"`);
+    console.log(
+      `  ⚠ Sin carrera reconocida — "${title}" | Insignias: "${insignias}" | Depto/Carrera/Iniciativa: "${depto}"`
+    );
   }
 
   return {

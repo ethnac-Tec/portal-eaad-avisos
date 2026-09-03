@@ -76,9 +76,24 @@ function normalize(str) {
     .replace(/[̀-ͯ]/g, '');
 }
 
+// Also recognized by their common Tec de Monterrey short codes, so a tag
+// like "LDI" or "ARQ" (instead of spelling out the full carrera name)
+// still resolves to a color. Word-boundary matched — otherwise short
+// codes like "arq" or "lad" would false-match inside unrelated words
+// ("parque", "traslado").
+const CARRERA_ALIASES = {
+  Arquitectura: ['arquitectura', 'arq'],
+  'Arte Digital': ['arte digital', 'laad', 'lad'],
+  Diseño: ['diseno', 'ldi'],
+  Urbanismo: ['urbanismo', 'lur'],
+};
+
 function inferCarrera(deptoText) {
   const norm = normalize(deptoText);
-  return CARRERAS.find((c) => norm.includes(normalize(c))) || null;
+  const carrera = CARRERAS.find((c) =>
+    (CARRERA_ALIASES[c] || [normalize(c)]).some((alias) => new RegExp(`\\b${alias}\\b`).test(norm))
+  );
+  return carrera || null;
 }
 
 const FECHA_FMT = new Intl.DateTimeFormat('es-MX', { day: '2-digit', month: 'short', year: 'numeric' });

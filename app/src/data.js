@@ -8,6 +8,7 @@
 export const CARRERAS = ['Todas', 'Arquitectura', 'Arte Digital', 'Diseño', 'Urbanismo'];
 
 export const COLORS = {
+  EAAD: '#6D28D9',
   Arquitectura: '#00A3AD',
   'Arte Digital': '#B23A82',
   Diseño: '#B8860B',

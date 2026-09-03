@@ -59,10 +59,15 @@ const COLUMNS = {
 // Carrera isn't its own dedicated Notion column — we infer it from the
 // "Insignias de la escuela" multi-select by matching one of these
 // keywords against the selected tags. Falls back to null (no carrera
-// badge/color) if nothing matches.
-const CARRERAS = ['Arquitectura', 'Arte Digital', 'Diseño', 'Urbanismo'];
+// badge/color) if nothing matches. "EAAD" is checked first and wins even
+// when every carrera is also selected alongside it (school-wide events,
+// e.g. "Asamblea EAAD" tags all four carreras + EAAD) — it's the school,
+// not a fifth carrera, so it takes priority rather than picking whichever
+// carrera happened to match first.
+const CARRERAS = ['EAAD', 'Arquitectura', 'Arte Digital', 'Diseño', 'Urbanismo'];
 
 export const COLORS = {
+  EAAD: '#6D28D9',
   Arquitectura: '#00A3AD',
   'Arte Digital': '#B23A82',
   Diseño: '#B8860B',
@@ -82,6 +87,7 @@ function normalize(str) {
 // codes like "arq" or "lad" would false-match inside unrelated words
 // ("parque", "traslado").
 const CARRERA_ALIASES = {
+  EAAD: ['eaad'],
   Arquitectura: ['arquitectura', 'arq'],
   'Arte Digital': ['arte digital', 'laad', 'lad'],
   Diseño: ['diseno', 'ldi'],
@@ -241,6 +247,7 @@ function toModuleSource(avisos) {
 export const CARRERAS = ['Todas', 'Arquitectura', 'Arte Digital', 'Diseño', 'Urbanismo'];
 
 export const COLORS = {
+  EAAD: '#6D28D9',
   Arquitectura: '#00A3AD',
   'Arte Digital': '#B23A82',
   Diseño: '#B8860B',

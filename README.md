@@ -72,11 +72,15 @@ Autoservicio para que un profesor agende un evento futuro sin pasar por gestión
 
 Arriba de los chips de categoría en el feed (`app/src/components/SpotlightBanner.jsx`), se muestra automáticamente el "Programado" más próximo en fecha — sin selección manual. Si no hay ningún "Programado" futuro, el banner simplemente no aparece. Enlaza al Calendario (no tiene nota propia todavía). Usa la descripción del Tally corto si la capturaste; si no hay póster todavía, muestra un recuadro gris en su lugar.
 
+### Calendario "solo días con eventos"
+
+El Calendario (`app/src/pages/Calendar.jsx`) no dibuja una cuadrícula completa del mes: solo aparecen las columnas de día-de-la-semana que tuvieron algo ese mes, y dentro de esas columnas, solo las celdas con avisos — el resto queda en blanco, sin caja ni número. Cada celda muestra el póster, no solo el título. Si un día tiene 2 avisos, la celda se divide en "franjas" (dos columnas iguales, una por aviso); con 3 o más no hay un tope todavía — se verá angosto pero no se rompe, y se ajustará si llega a pasar en la práctica. En pantallas angostas (≤720px) la cuadrícula se reemplaza por una lista cronológica de una sola columna (mismo criterio de "solo lo que tiene algo"), controlada por CSS en `app/src/index.css` (`.calendar-grid-view` / `.calendar-list-view`).
+
 ## Estado actual
 
 - Vista pública: feed con destacado, chips de filtro por carrera (Arquitectura, Arte Digital, Diseño, Urbanismo), grid de tarjetas y vista de detalle. URLs con React Router (`/`, `/aviso/:id`, `/calendario`) para poder compartir enlaces directos a cada aviso.
 - Panel "Navegar" (filtro por Campus + acceso a Calendario + link a Carreras): columna fija en escritorio, menú colapsable en móvil. La lista de campus se arma sola a partir de los valores reales en los datos, no está hardcodeada.
-- Vista de Calendario mensual con los avisos ubicados por fecha; clic en un evento abre un modal con resumen y link a la nota completa. También muestra avisos "Programado" (save-the-date sin nota todavía, vía un segundo Tally corto — ver sección de arriba).
+- Vista de Calendario "solo días con eventos", con póster por aviso y franjas para días con 2 avisos (ver sección de arriba). También muestra avisos "Programado" (save-the-date sin nota todavía, vía un segundo Tally corto — ver sección de arriba).
 - Paleta monocromática (negro/blanco) y tipografía Arial/Helvetica, actualizada desde una segunda iteración en Claude Design.
 - Integración con Notion vía `app/scripts/fetch-notion.mjs` (build-time, filtrada por estado). Datos de muestra en `app/src/data.js` mientras no se corra el fetch — mismo formato en ambos casos.
 - Formulario de profesores: se queda en Tally (ver arriba), linkeado desde el footer.

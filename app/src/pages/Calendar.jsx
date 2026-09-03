@@ -8,27 +8,33 @@ const MESES = [
 ];
 const WEEKDAYS = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
 
-function buildCalDays(year, month, today) {
-  const first = new Date(year, month, 1);
-  const startWeekday = first.getDay();
+// Only days that actually have something are worth a cell — a mostly-empty
+// month shouldn't render five weeks of blank boxes. Skips weekday columns
+// with nothing all month too, and weeks with nothing in any active column.
+function buildMonthEvents(year, month, today) {
   const daysInMonth = new Date(year, month + 1, 0).getDate();
-  const cells = [];
-  for (let i = 0; i < startWeekday; i++) cells.push(null);
-  for (let d = 1; d <= daysInMonth; d++) cells.push(d);
-  while (cells.length < 42) cells.push(null);
+  const firstWeekday = new Date(year, month, 1).getDay();
+  const byDay = new Map();
 
-  return cells.map((num) => {
-    if (!num) return { num: null };
-    const iso = `${year}-${String(month + 1).padStart(2, '0')}-${String(num).padStart(2, '0')}`;
-    const isToday =
-      year === today.getFullYear() && month === today.getMonth() && num === today.getDate();
-    const dayItems = AVISOS.filter((d) => d.fechaISO === iso);
+  for (let d = 1; d <= daysInMonth; d++) {
+    const iso = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+    const dayItems = AVISOS.filter((a) => a.fechaISO === iso);
+    if (!dayItems.length) continue;
     // Once the real note for a date exists, hide the "save the date"
     // placeholder(s) for that same day — the note takes its slot.
-    const hasPublicado = dayItems.some((d) => d.estado === 'Publicado');
-    const events = hasPublicado ? dayItems.filter((d) => d.estado === 'Publicado') : dayItems;
-    return { num, iso, isToday, events };
-  });
+    const hasPublicado = dayItems.some((a) => a.estado === 'Publicado');
+    const events = hasPublicado ? dayItems.filter((a) => a.estado === 'Publicado') : dayItems;
+    const weekday = new Date(year, month, d).getDay();
+    const weekIndex = Math.floor((d - 1 + firstWeekday) / 7);
+    const isToday = year === today.getFullYear() && month === today.getMonth() && d === today.getDate();
+    byDay.set(`${weekIndex}-${weekday}`, { day: d, weekday, weekIndex, isToday, events });
+  }
+
+  const entries = [...byDay.values()];
+  const activeWeekdays = [...new Set(entries.map((e) => e.weekday))].sort((a, b) => a - b);
+  const activeWeeks = [...new Set(entries.map((e) => e.weekIndex))].sort((a, b) => a - b);
+
+  return { byDay, activeWeekdays, activeWeeks };
 }
 
 export default function Calendar() {
@@ -37,7 +43,11 @@ export default function Calendar() {
   const [selectedId, setSelectedId] = useState(null);
   const navigate = useNavigate();
 
-  const calDays = useMemo(() => buildCalDays(cursor.year, cursor.month, today), [cursor, today]);
+  const { byDay, activeWeekdays, activeWeeks } = useMemo(
+    () => buildMonthEvents(cursor.year, cursor.month, today),
+    [cursor, today]
+  );
+  const sortedEntries = useMemo(() => [...byDay.values()].sort((a, b) => a.day - b.day), [byDay]);
   const selected = selectedId ? AVISOS.find((d) => d.id === selectedId) : null;
   const selectedColor = selected ? COLORS[selected.carrera] || '#c0562b' : null;
   const isProgramado = selected?.estado === 'Programado';
@@ -68,37 +78,96 @@ export default function Calendar() {
           </div>
         </div>
 
-        <div style={styles.grid}>
-          {WEEKDAYS.map((wd) => (
-            <div key={wd} style={styles.weekdayCell}>{wd}</div>
-          ))}
-          {calDays.map((day, i) =>
-            day.num ? (
-              <div key={i} style={styles.dayCell}>
-                <span style={day.isToday ? styles.dayNumToday : styles.dayNum}>{day.num}</span>
-                {day.events.map((ev) => {
-                  const color = COLORS[ev.carrera] || '#000';
-                  const isProgramado = ev.estado === 'Programado';
-                  return (
-                    <div
-                      key={ev.id}
-                      onClick={() => setSelectedId(ev.id)}
-                      style={
-                        isProgramado
-                          ? { ...styles.eventPill, ...styles.eventPillOutline, borderColor: color, color }
-                          : { ...styles.eventPill, background: color }
-                      }
-                    >
-                      {ev.title.length > 18 ? ev.title.slice(0, 17) + '…' : ev.title}
-                    </div>
-                  );
-                })}
+        {activeWeekdays.length === 0 ? (
+          <p style={styles.empty}>No hay avisos ni eventos programados este mes.</p>
+        ) : (
+          <>
+            <div className="calendar-grid-view">
+              <div style={{ ...styles.grid, gridTemplateColumns: `repeat(${activeWeekdays.length}, 1fr)` }}>
+                {activeWeekdays.map((wd, i) => (
+                  <div
+                    key={`h-${wd}`}
+                    style={{ ...styles.weekdayCell, ...(i === activeWeekdays.length - 1 ? styles.lastCol : {}) }}
+                  >
+                    {WEEKDAYS[wd]}
+                  </div>
+                ))}
+
+                {activeWeeks.map((wi) =>
+                  activeWeekdays.map((wd, i) => {
+                    const isLast = i === activeWeekdays.length - 1;
+                    const entry = byDay.get(`${wi}-${wd}`);
+                    if (!entry) {
+                      return (
+                        <div key={`${wi}-${wd}`} style={{ ...styles.emptyCell, ...(isLast ? styles.lastCol : {}) }} />
+                      );
+                    }
+                    const multi = entry.events.length > 1;
+                    return (
+                      <div key={`${wi}-${wd}`} style={{ ...styles.dayCell, ...(isLast ? styles.lastCol : {}) }}>
+                        <div style={styles.dayNumRow}>
+                          <span style={entry.isToday ? styles.dayNumToday : styles.dayNum}>{entry.day}</span>
+                          {multi && <span style={styles.multiTag}>· {entry.events.length} eventos</span>}
+                        </div>
+                        <div style={styles.franjaRow}>
+                          {entry.events.map((ev) => {
+                            const color = COLORS[ev.carrera] || '#000';
+                            return (
+                              <div key={ev.id} onClick={() => setSelectedId(ev.id)} style={styles.franja}>
+                                <div
+                                  style={{
+                                    ...styles.franjaImageWrap,
+                                    aspectRatio: multi ? '1 / 1' : '4 / 3',
+                                  }}
+                                >
+                                  {ev.image && <img src={ev.image} alt="" style={styles.franjaImage} />}
+                                  <div style={{ ...styles.franjaColorBar, background: color }} />
+                                </div>
+                                {ev.carrera && <div style={{ ...styles.franjaCarrera, color }}>{ev.carrera}</div>}
+                                <div style={styles.franjaTitle}>{ev.title}</div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    );
+                  })
+                )}
               </div>
-            ) : (
-              <div key={i} style={styles.emptyCell} />
-            )
-          )}
-        </div>
+            </div>
+
+            {/* A weekday-column matrix doesn't fit a phone width — same
+                "only days with something" idea, as one chronological list. */}
+            <div className="calendar-list-view">
+              {sortedEntries.map((entry) => (
+                <div key={entry.day} style={styles.listRow}>
+                  <div style={styles.listDayNum}>
+                    {entry.day}
+                    <br />
+                    <span style={styles.listWeekday}>{WEEKDAYS[entry.weekday]}</span>
+                  </div>
+                  <div style={styles.listEvents}>
+                    {entry.events.map((ev) => {
+                      const color = COLORS[ev.carrera] || '#000';
+                      return (
+                        <div key={ev.id} onClick={() => setSelectedId(ev.id)} style={styles.listEvent}>
+                          <div style={styles.listThumb}>
+                            {ev.image && <img src={ev.image} alt="" style={styles.franjaImage} />}
+                            <div style={{ ...styles.franjaColorBar, background: color }} />
+                          </div>
+                          <div style={{ minWidth: 0 }}>
+                            {ev.carrera && <div style={{ ...styles.listCarrera, color }}>{ev.carrera}</div>}
+                            <div style={styles.listTitle}>{ev.title}</div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
+        )}
       </div>
 
       {selected && (
@@ -144,7 +213,7 @@ export default function Calendar() {
 
 const styles = {
   main: { animation: 'eaadFade 0.4s ease both' },
-  backRow: { maxWidth: 1000, margin: '0 auto', padding: '22px 22px 0' },
+  backRow: { maxWidth: 1200, margin: '0 auto', padding: '22px 22px 0' },
   backLink: {
     background: 'none',
     border: 'none',
@@ -158,13 +227,13 @@ const styles = {
     alignItems: 'center',
     gap: 7,
   },
-  inner: { maxWidth: 1000, margin: '0 auto', padding: '10px 22px 80px' },
+  inner: { maxWidth: 1200, margin: '0 auto', padding: '10px 22px 80px' },
   header: {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
     gap: 16,
-    margin: '10px 0 28px',
+    margin: '10px 0 8px',
     flexWrap: 'wrap',
   },
   title: {
@@ -188,67 +257,137 @@ const styles = {
     fontWeight: 700,
     color: '#14171c',
   },
+  empty: {
+    padding: '40px 0 60px',
+    color: '#6b7484',
+    fontSize: 15,
+  },
+  // Only the weekdays that had something this month become columns; days
+  // and weekdays without events render as blank space, not empty boxes.
   grid: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(7, 1fr)',
-    gap: 1,
-    background: '#dfe3ea',
-    border: '1px solid #dfe3ea',
+    borderTop: '2px solid #14171c',
   },
+  lastCol: { borderRight: '1px solid #e3e6ec' },
   weekdayCell: {
-    background: '#f5f5f5',
-    padding: '8px 4px',
-    textAlign: 'center',
+    borderLeft: '1px solid #e3e6ec',
+    padding: '10px 14px',
     fontSize: 11,
     fontWeight: 700,
-    color: '#55627a',
+    color: '#6b7484',
     textTransform: 'uppercase',
-    letterSpacing: '0.05em',
+    letterSpacing: '0.1em',
+  },
+  emptyCell: {
+    borderLeft: '1px solid #e3e6ec',
+    borderTop: '1px solid #eef0f3',
   },
   dayCell: {
-    background: '#fff',
-    minHeight: 88,
-    padding: 8,
-    display: 'flex',
-    flexDirection: 'column',
-    gap: 4,
+    borderLeft: '1px solid #e3e6ec',
+    borderTop: '1px solid #eef0f3',
+    padding: '16px 14px 20px',
   },
-  emptyCell: { background: '#fbfbfb', minHeight: 88, padding: 8 },
+  dayNumRow: { display: 'flex', alignItems: 'baseline', gap: 6, marginBottom: 10 },
   dayNum: {
-    fontSize: 12,
-    fontWeight: 700,
-    color: '#14171c',
     fontFamily: 'Inter, Arial, Helvetica, sans-serif',
+    fontWeight: 800,
+    fontSize: 26,
+    color: '#14171c',
   },
   dayNumToday: {
     display: 'inline-flex',
     alignItems: 'center',
     justifyContent: 'center',
-    width: 22,
-    height: 22,
+    width: 34,
+    height: 34,
     borderRadius: '50%',
     background: '#000',
     color: '#fff',
-    fontSize: 12,
-    fontWeight: 700,
     fontFamily: 'Inter, Arial, Helvetica, sans-serif',
+    fontWeight: 800,
+    fontSize: 16,
   },
-  eventPill: {
-    cursor: 'pointer',
-    fontSize: '10.5px',
+  multiTag: {
+    fontFamily: 'Inter, Arial, Helvetica, sans-serif',
+    fontWeight: 700,
+    fontSize: 11,
+    color: '#9098a3',
+  },
+  franjaRow: { display: 'flex', gap: 8 },
+  franja: { cursor: 'pointer', flex: 1, minWidth: 0 },
+  franjaImageWrap: {
+    position: 'relative',
+    background: '#dce1e8',
+    marginBottom: 8,
+  },
+  franjaImage: {
+    position: 'absolute',
+    inset: 0,
+    width: '100%',
+    height: '100%',
+    objectFit: 'cover',
+  },
+  franjaColorBar: { position: 'absolute', top: 0, left: 0, height: 4, width: '100%' },
+  franjaCarrera: {
+    fontFamily: 'Inter, Arial, Helvetica, sans-serif',
+    fontWeight: 700,
+    fontSize: 11,
+    letterSpacing: '0.03em',
+    textTransform: 'uppercase',
+    marginBottom: 4,
+  },
+  franjaTitle: {
+    fontFamily: 'Inter, Arial, Helvetica, sans-serif',
+    fontWeight: 700,
+    fontSize: 13,
     lineHeight: 1.3,
-    padding: '3px 5px',
-    borderRadius: 3,
-    color: '#fff',
+    color: '#14171c',
+  },
+  listRow: {
+    display: 'flex',
+    gap: 14,
+    padding: '16px 0',
+    borderTop: '1px solid #e3e6ec',
+  },
+  listDayNum: {
+    flex: 'none',
+    width: 40,
+    paddingTop: 2,
+    fontFamily: 'Inter, Arial, Helvetica, sans-serif',
+    fontWeight: 800,
+    fontSize: 20,
+    color: '#14171c',
+  },
+  listWeekday: {
+    fontWeight: 700,
+    fontSize: 10,
+    letterSpacing: '0.06em',
+    textTransform: 'uppercase',
+    color: '#9098a3',
+  },
+  listEvents: { flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 12 },
+  listEvent: { cursor: 'pointer', display: 'flex', gap: 10 },
+  listThumb: {
+    position: 'relative',
+    flex: 'none',
+    width: 72,
+    height: 72,
+    background: '#dce1e8',
+  },
+  listCarrera: {
     fontFamily: 'Inter, Arial, Helvetica, sans-serif',
     fontWeight: 700,
+    fontSize: 11,
+    letterSpacing: '0.03em',
+    textTransform: 'uppercase',
+    marginBottom: 2,
   },
-  // "Programado" — save-the-date, no article yet: outlined instead of a
-  // solid fill, so it visually reads as lighter/tentative next to real
-  // (solid) published avisos.
-  eventPillOutline: {
-    background: '#fff',
-    border: '1px solid currentColor',
+  listTitle: {
+    fontFamily: 'Inter, Arial, Helvetica, sans-serif',
+    fontWeight: 700,
+    fontSize: 13.5,
+    lineHeight: 1.3,
+    color: '#14171c',
   },
   overlay: {
     position: 'fixed',

@@ -90,3 +90,20 @@ img {
     display: block;
   }
 }
+
+/* Calendar: weekday-column grid on wide viewports, a single chronological
+   list below a width where that many columns stop being legible. */
+.calendar-grid-view {
+  display: block;
+}
+.calendar-list-view {
+  display: none;
+}
+@media (max-width: 720px) {
+  .calendar-grid-view {
+    display: none;
+  }
+  .calendar-list-view {
+    display: block;
+  }
+}

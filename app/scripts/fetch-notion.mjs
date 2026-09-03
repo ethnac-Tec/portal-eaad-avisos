@@ -208,11 +208,14 @@ function mapPage(page) {
   const depto = readProperty(page, 'depto') || '';
   const insignias = readProperty(page, 'insignias') || '';
   const { summary, body } = splitDescripcion(readProperty(page, 'descripcion'));
-  // "Insignias de la escuela" is the primary source; the short Tally
-  // ("Programado" / save-the-date) form instead saves carrera into
-  // "Departamento, Carrera o Iniciativa..." (the `depto` column), so fall
-  // back to that when the first one is empty.
-  const carrera = inferCarrera(insignias) || inferCarrera(depto);
+  // Search both columns TOGETHER, not one-then-the-other: the short Tally
+  // ("Programado" / save-the-date) form saves carrera into "Departamento,
+  // Carrera o Iniciativa..." (the `depto` column) instead of "Insignias de
+  // la escuela", and some avisos have a value in each. Checking Insignias
+  // alone first would let a stray match there (e.g. "Arquitectura") win
+  // over an "EAAD" that's only in `depto`, silently defeating EAAD's
+  // priority — so both are combined into one search instead.
+  const carrera = inferCarrera(`${insignias} ${depto}`);
   if (!carrera) {
     console.log(
       `  ⚠ Sin carrera reconocida — "${title}" | Insignias: "${insignias}" | Depto/Carrera/Iniciativa: "${depto}"`

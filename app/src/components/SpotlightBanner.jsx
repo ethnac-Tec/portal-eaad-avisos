@@ -140,7 +140,7 @@ const styles = {
     fontSize: 17,
     lineHeight: 1.6,
     color: '#47505f',
-    maxWidth: '76ch',
+    textAlign: 'justify',
   },
   footer: {
     display: 'flex',

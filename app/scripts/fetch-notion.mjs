@@ -85,7 +85,7 @@ const CARRERA_ALIASES = {
   Arquitectura: ['arquitectura', 'arq'],
   'Arte Digital': ['arte digital', 'laad', 'lad'],
   Diseño: ['diseno', 'ldi'],
-  Urbanismo: ['urbanismo', 'lur'],
+  Urbanismo: ['urbanismo', 'lub'],
 };
 
 function inferCarrera(deptoText) {
